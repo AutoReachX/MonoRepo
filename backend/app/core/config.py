@@ -25,6 +25,12 @@ class Settings(BaseSettings):
     TWITTER_BEARER_TOKEN: str = os.getenv("TWITTER_BEARER_TOKEN", "")
     TWITTER_OAUTH_REDIRECT_URI: str = os.getenv("TWITTER_OAUTH_REDIRECT_URI", "http://localhost:3000/auth/callback")
 
+    # Twitter API v1.1 (for tweepy compatibility)
+    TWITTER_API_KEY: str = os.getenv("TWITTER_API_KEY", "")
+    TWITTER_API_SECRET: str = os.getenv("TWITTER_API_SECRET", "")
+    TWITTER_ACCESS_TOKEN: str = os.getenv("TWITTER_ACCESS_TOKEN", "")
+    TWITTER_ACCESS_TOKEN_SECRET: str = os.getenv("TWITTER_ACCESS_TOKEN_SECRET", "")
+
     # OpenAI API
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
 
