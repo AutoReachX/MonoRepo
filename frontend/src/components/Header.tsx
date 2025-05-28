@@ -2,16 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { NAVIGATION_ITEMS } from '@/lib/constants';
+import Logo from '@/components/ui/Logo';
 
-const Header = () => {
+interface HeaderProps {
+  showNavigation?: boolean;
+}
+
+const Header = ({ showNavigation = true }: HeaderProps) => {
   const pathname = usePathname();
-
-  const navItems = [
-    { name: 'Dashboard', path: '/dashboard' },
-    { name: 'Content', path: '/content' },
-    { name: 'Analytics', path: '/analytics' },
-    { name: 'Settings', path: '/settings' },
-  ];
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
@@ -19,30 +18,27 @@ const Header = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/dashboard" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">A</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">AutoReach</span>
-            </Link>
+            <Logo />
           </div>
 
           {/* Navigation */}
-          <nav className="hidden md:flex space-x-8">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                href={item.path}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  pathname === item.path
-                    ? 'text-primary-600 bg-primary-50'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </nav>
+          {showNavigation && (
+            <nav className="hidden md:flex space-x-8">
+              {NAVIGATION_ITEMS.map((item) => (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    pathname === item.path
+                      ? 'text-primary-600 bg-primary-50'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </nav>
+          )}
 
           {/* User menu */}
           <div className="flex items-center space-x-4">

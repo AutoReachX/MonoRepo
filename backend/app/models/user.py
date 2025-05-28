@@ -8,12 +8,18 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    # Twitter OAuth data (primary authentication method)
-    twitter_user_id = Column(String, unique=True, index=True, nullable=False)
-    twitter_username = Column(String, unique=True, index=True, nullable=False)
-    twitter_access_token = Column(Text, nullable=False)  # Encrypted in production
-    twitter_refresh_token = Column(Text)
-    token_expiry = Column(DateTime(timezone=True))
+    # Traditional authentication (for development/testing)
+    username = Column(String, unique=True, index=True, nullable=True)
+    email = Column(String, unique=True, index=True, nullable=True)
+    hashed_password = Column(String, nullable=True)
+    full_name = Column(String, nullable=True)
+
+    # Twitter OAuth data (primary authentication method for production)
+    twitter_user_id = Column(String, unique=True, index=True, nullable=True)
+    twitter_username = Column(String, unique=True, index=True, nullable=True)
+    twitter_access_token = Column(Text, nullable=True)  # Encrypted in production
+    twitter_refresh_token = Column(Text, nullable=True)
+    token_expiry = Column(DateTime(timezone=True), nullable=True)
 
     # User preferences
     language_pref = Column(String, default="en")

@@ -11,6 +11,9 @@ class OpenAIConstants:
     REPLY_MAX_TOKENS = 280
     DEFAULT_TEMPERATURE = 0.7
     DEFAULT_N = 1
+    MAX_RETRIES = 3
+    RETRY_DELAY_SECONDS = 1
+    TIMEOUT_SECONDS = 30
 
 
 # Twitter Configuration
@@ -18,6 +21,10 @@ class TwitterConstants:
     MAX_TWEET_LENGTH = 280
     MAX_THREAD_TWEETS = 25
     DEFAULT_THREAD_SIZE = 3
+    MAX_HASHTAGS_RECOMMENDED = 3
+    MAX_MENTIONS_RECOMMENDED = 5
+    RATE_LIMIT_WINDOW_MINUTES = 15
+    MAX_TWEETS_PER_WINDOW = 300
 
 
 # Content Generation
@@ -27,7 +34,7 @@ class ContentConstants:
     SUPPORTED_LANGUAGES = ["en", "es", "fr", "de", "it", "pt"]
     SUPPORTED_STYLES = [
         "engaging",
-        "professional", 
+        "professional",
         "casual",
         "educational",
         "humorous",
@@ -105,3 +112,33 @@ class CacheConstants:
     USER_CACHE_TTL = 900  # 15 minutes
     CONTENT_CACHE_TTL = 1800  # 30 minutes
     ANALYTICS_CACHE_TTL = 3600  # 1 hour
+
+
+# API Configuration
+class APIConstants:
+    DEFAULT_TIMEOUT_SECONDS = 30
+    MAX_REQUEST_SIZE_MB = 10
+    CORS_MAX_AGE_SECONDS = 3600
+    DEFAULT_PAGE = 1
+
+
+# Error Messages
+class ErrorMessages:
+    INVALID_CREDENTIALS = "Invalid username or password"
+    TOKEN_EXPIRED = "Authentication token has expired"
+    INSUFFICIENT_PERMISSIONS = "Insufficient permissions for this action"
+    CONTENT_TOO_LONG = "Content exceeds maximum length"
+    INVALID_TOPIC = "Topic must be between {min} and {max} characters"
+    GENERATION_FAILED = "Content generation failed. Please try again."
+    RATE_LIMIT_EXCEEDED = "Rate limit exceeded. Please try again later."
+    EXTERNAL_API_ERROR = "External service is temporarily unavailable"
+
+
+# Success Messages
+class SuccessMessages:
+    CONTENT_GENERATED = "Content generated successfully"
+    TWEET_POSTED = "Tweet posted successfully"
+    USER_CREATED = "User account created successfully"
+    SETTINGS_UPDATED = "Settings updated successfully"
+    LOGIN_SUCCESSFUL = "Login successful"
+    LOGOUT_SUCCESSFUL = "Logout successful"

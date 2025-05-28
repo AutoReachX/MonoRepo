@@ -1,0 +1,30 @@
+{
+  "name": "autoreach-connection-tests",
+  "version": "1.0.0",
+  "description": "Connection tests for AutoReach frontend-backend integration",
+  "main": "run-connection-tests.js",
+  "scripts": {
+    "test": "node run-connection-tests.js",
+    "test:quick": "node quick-test.js",
+    "test:backend": "cd backend && python tests/test_integration.py",
+    "test:frontend": "cd frontend && node test-frontend-connection.js",
+    "test:integration": "node test-connection.js",
+    "start:backend": "cd backend && python start_server.py",
+    "start:frontend": "cd frontend && npm run dev",
+    "setup": "npm run setup:backend && npm run setup:frontend",
+    "setup:backend": "cd backend && python -m venv venv && venv/Scripts/pip install -r requirements.txt",
+    "setup:frontend": "cd frontend && npm install"
+  },
+  "dependencies": {
+    "axios": "^1.9.0"
+  },
+  "keywords": [
+    "autoreach",
+    "testing",
+    "integration",
+    "frontend",
+    "backend"
+  ],
+  "author": "AutoReach Team",
+  "license": "MIT"
+}

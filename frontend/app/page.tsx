@@ -28,6 +28,33 @@ export default function Home() {
               Watch Demo
             </Button>
           </div>
+
+          {/* Quick Navigation */}
+          <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
+            <Link href="/dashboard" className="p-4 bg-white/80 backdrop-blur-sm rounded-lg shadow-sm hover:shadow-md transition-shadow text-center">
+              <div className="text-2xl mb-2">📊</div>
+              <div className="text-sm font-medium text-gray-700">Dashboard</div>
+            </Link>
+            <Link href="/content" className="p-4 bg-white/80 backdrop-blur-sm rounded-lg shadow-sm hover:shadow-md transition-shadow text-center">
+              <div className="text-2xl mb-2">✍️</div>
+              <div className="text-sm font-medium text-gray-700">Content</div>
+            </Link>
+            <Link href="/analytics" className="p-4 bg-white/80 backdrop-blur-sm rounded-lg shadow-sm hover:shadow-md transition-shadow text-center">
+              <div className="text-2xl mb-2">📈</div>
+              <div className="text-sm font-medium text-gray-700">Analytics</div>
+            </Link>
+            <Link href="/settings" className="p-4 bg-white/80 backdrop-blur-sm rounded-lg shadow-sm hover:shadow-md transition-shadow text-center">
+              <div className="text-2xl mb-2">⚙️</div>
+              <div className="text-sm font-medium text-gray-700">Settings</div>
+            </Link>
+          </div>
+
+          {/* Test Connection Link */}
+          <div className="mt-8">
+            <Link href="/test-connection" className="text-sm text-gray-600 hover:text-gray-800 underline">
+              🧪 Test Backend Connection
+            </Link>
+          </div>
         </div>
 
         {/* Features */}

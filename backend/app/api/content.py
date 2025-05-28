@@ -1,16 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import Optional
 
 from app.core.database import get_db
 from app.models.user import User
-from app.models.content_log import ContentLog
 from app.api.auth import get_current_user
-from app.core.exceptions import handle_exception, ValidationError, ContentGenerationError
 from app.core.constants import ContentConstants
-from app.core.dependencies import get_content_service
-from app.services.content_service import ContentService
+from app.core.dependencies import get_content_orchestration_service
+from app.services.content_orchestration_service import ContentOrchestrationService
+from app.core.error_handlers import handle_service_errors
 
 router = APIRouter()
 
@@ -40,136 +39,99 @@ class ContentResponse(BaseModel):
     error: Optional[str]
 
 @router.post("/generate-tweet", response_model=ContentResponse)
+@handle_service_errors
 async def generate_tweet(
     request: ContentGenerationRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-    content_service: ContentService = Depends(get_content_service)
+    content_service: ContentOrchestrationService = Depends(get_content_orchestration_service)
 ):
     """Generate a tweet using AI"""
-    try:
-        # Use content service to handle the generation
-        result = await content_service.generate_tweet(
-            topic=request.topic,
-            style=request.style,
-            user_context=request.user_context,
-            language=request.language or current_user.language_pref,
-            user=current_user,
-            db=db
-        )
+    # Use content orchestration service to handle the generation and logging
+    result = await content_service.generate_and_log_tweet(
+        topic=request.topic,
+        style=request.style,
+        user_context=request.user_context,
+        language=request.language or getattr(current_user, 'language_pref', 'en'),
+        user=current_user,
+        db=db
+    )
 
-        return ContentResponse(
-            success=True,
-            content=result["content"],
-            prompt=result["prompt"],
-            tokens_used=result.get("tokens_used"),
-            error=None
-        )
-
-    except (ValidationError, ContentGenerationError) as e:
-        raise handle_exception(e)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Content generation failed: {str(e)}"
-        )
+    return ContentResponse(
+        success=True,
+        content=result["content"],
+        prompt=result["prompt"],
+        tokens_used=result.get("tokens_used"),
+        error=None
+    )
 
 @router.post("/generate-thread", response_model=ContentResponse)
+@handle_service_errors
 async def generate_thread(
     request: ThreadGenerationRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-    content_service: ContentService = Depends(get_content_service)
+    content_service: ContentOrchestrationService = Depends(get_content_orchestration_service)
 ):
     """Generate a Twitter thread using AI"""
-    try:
-        result = await content_service.generate_thread(
-            topic=request.topic,
-            num_tweets=request.num_tweets,
-            style=request.style,
-            language=request.language or current_user.language_pref,
-            user=current_user,
-            db=db
-        )
+    result = await content_service.generate_and_log_thread(
+        topic=request.topic,
+        num_tweets=request.num_tweets,
+        style=request.style,
+        language=request.language or getattr(current_user, 'language_pref', 'en'),
+        user=current_user,
+        db=db
+    )
 
-        return ContentResponse(
-            success=True,
-            content=result["content"],
-            prompt=result["prompt"],
-            tokens_used=result.get("tokens_used"),
-            error=None
-        )
-
-    except (ValidationError, ContentGenerationError) as e:
-        raise handle_exception(e)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Thread generation failed: {str(e)}"
-        )
+    return ContentResponse(
+        success=True,
+        content=result["content"],
+        prompt=result["prompt"],
+        tokens_used=result.get("tokens_used"),
+        error=None
+    )
 
 @router.post("/generate-reply", response_model=ContentResponse)
+@handle_service_errors
 async def generate_reply(
     request: ReplyGenerationRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-    content_service: ContentService = Depends(get_content_service)
+    content_service: ContentOrchestrationService = Depends(get_content_orchestration_service)
 ):
     """Generate a reply to a tweet using AI"""
-    try:
-        result = await content_service.generate_reply(
-            original_tweet=request.original_tweet,
-            reply_style=request.reply_style,
-            user_context=request.user_context,
-            language=request.language or current_user.language_pref,
-            user=current_user,
-            db=db
-        )
+    result = await content_service.generate_and_log_reply(
+        original_tweet=request.original_tweet,
+        reply_style=request.reply_style,
+        user_context=request.user_context,
+        language=request.language or getattr(current_user, 'language_pref', 'en'),
+        user=current_user,
+        db=db
+    )
 
-        return ContentResponse(
-            success=True,
-            content=result["content"],
-            prompt=result["prompt"],
-            tokens_used=result.get("tokens_used"),
-            error=None
-        )
-
-    except (ValidationError, ContentGenerationError) as e:
-        raise handle_exception(e)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Reply generation failed: {str(e)}"
-        )
+    return ContentResponse(
+        success=True,
+        content=result["content"],
+        prompt=result["prompt"],
+        tokens_used=result.get("tokens_used"),
+        error=None
+    )
 
 @router.get("/history")
+@handle_service_errors
 async def get_content_history(
     skip: int = 0,
     limit: int = 50,
+    mode_filter: str = None,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    content_service: ContentOrchestrationService = Depends(get_content_orchestration_service)
 ):
     """Get user's content generation history"""
-    # Get total count
-    total = db.query(ContentLog).filter(
-        ContentLog.user_id == current_user.id
-    ).count()
-
-    # Get paginated results
-    content_logs = db.query(ContentLog).filter(
-        ContentLog.user_id == current_user.id
-    ).order_by(ContentLog.created_at.desc()).offset(skip).limit(limit).all()
-
-    return {
-        "history": [
-            {
-                "id": log.id,
-                "mode": log.mode,
-                "prompt": log.prompt[:100] + "..." if len(log.prompt) > 100 else log.prompt,
-                "generated_text": log.generated_text,
-                "created_at": log.created_at
-            }
-            for log in content_logs
-        ],
-        "total": total
-    }
+    return content_service.get_user_content_history(
+        user=current_user,
+        db=db,
+        limit=limit,
+        offset=skip,
+        mode_filter=mode_filter
+    )

@@ -1,41 +1,23 @@
 """
-Dependency injection container for services.
-Following Dependency Inversion Principle.
+Dependency injection for services.
+Simplified to follow KISS principle while maintaining Dependency Inversion Principle.
 """
 
 from functools import lru_cache
-from app.services.openai_service import create_openai_service
 from app.services.twitter_service import create_twitter_service
 from app.services.validation_service import ValidationService
-from app.services.content_service import ContentService
+from app.services.content_generation_service import create_content_generation_service
+from app.services.content_logging_service import create_content_logging_service
+from app.services.content_orchestration_service import create_content_orchestration_service
 from app.core.interfaces import ContentGeneratorInterface
+from app.core.ai_provider_factory import create_default_provider
 
 
-class ServiceContainer:
-    """Container for managing service dependencies"""
-
-    def __init__(self):
-        self._services = {}
-
-    def register_service(self, interface_type: type, implementation: object) -> None:
-        """Register a service implementation for an interface"""
-        self._services[interface_type] = implementation
-
-    def get_service(self, interface_type: type) -> object:
-        """Get a service implementation by interface type"""
-        if interface_type not in self._services:
-            raise ValueError(f"Service not registered for {interface_type}")
-        return self._services[interface_type]
-
-
-# Global service container
-_container = ServiceContainer()
-
-
+# Simplified dependency injection using FastAPI's built-in caching
 @lru_cache()
-def get_openai_service() -> ContentGeneratorInterface:
-    """Get OpenAI service instance"""
-    return create_openai_service()
+def get_ai_provider() -> ContentGeneratorInterface:
+    """Get AI provider instance (defaults to OpenAI)"""
+    return create_default_provider()
 
 
 @lru_cache()
@@ -51,21 +33,31 @@ def get_validation_service() -> ValidationService:
 
 
 @lru_cache()
-def get_content_service() -> ContentService:
-    """Get content service instance"""
-    return ContentService(
-        content_generator=get_openai_service(),
+def get_content_generation_service():
+    """Get content generation service instance"""
+    return create_content_generation_service(
+        content_generator=get_ai_provider()
+    )
+
+
+@lru_cache()
+def get_content_logging_service():
+    """Get content logging service instance"""
+    return create_content_logging_service()
+
+
+@lru_cache()
+def get_content_orchestration_service():
+    """Get content orchestration service instance"""
+    return create_content_orchestration_service(
+        generation_service=get_content_generation_service(),
+        logging_service=get_content_logging_service(),
         validation_service=get_validation_service()
     )
 
 
-# Initialize services lazily when needed
-def initialize_services():
-    """Initialize all services in the container"""
-    try:
-        _container.register_service(ContentGeneratorInterface, get_openai_service())
-        _container.register_service(ValidationService, get_validation_service())
-        _container.register_service(ContentService, get_content_service())
-    except Exception:
-        # Allow initialization to fail gracefully for testing
-        pass
+# Backward compatibility - this will be the main service used by API endpoints
+@lru_cache()
+def get_content_service():
+    """Get content service instance (orchestration service for backward compatibility)"""
+    return get_content_orchestration_service()

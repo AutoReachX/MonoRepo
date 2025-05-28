@@ -17,7 +17,12 @@ class Settings(BaseSettings):
     DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://user:password@localhost/autoreach")
 
     # CORS
-    ALLOWED_HOSTS: List[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    ALLOWED_HOSTS: List[str] = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001"
+    ]
 
     # Twitter API (OAuth 2.0)
     TWITTER_CLIENT_ID: str = os.getenv("TWITTER_CLIENT_ID", "")
