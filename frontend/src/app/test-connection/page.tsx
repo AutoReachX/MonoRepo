@@ -1,8 +1,11 @@
 // import ConnectionTest from '../../components/ConnectionTest';
+import Header from '@/components/Header';
 
 export default function TestConnectionPage() {
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <div className="py-8">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-4">
@@ -110,6 +113,7 @@ export default function TestConnectionPage() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

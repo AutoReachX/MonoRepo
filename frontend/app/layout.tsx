@@ -8,8 +8,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AutoReach - AI-Powered Twitter Growth",
+  title: "AutoReach",
   description: "Automate your Twitter growth with AI-powered content creation and engagement",
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({

@@ -106,6 +106,30 @@ class TwitterService:
             }
         return None
 
+    def get_current_user_info(self) -> Optional[Dict[str, Any]]:
+        """Get current authenticated user's information from Twitter"""
+        try:
+            self._ensure_client()
+            user = self.client.get_me(user_fields=["public_metrics"])
+            if user.data:
+                return {
+                    "data": {
+                        "id": user.data.id,
+                        "username": user.data.username,
+                        "name": user.data.name,
+                        "followers_count": user.data.public_metrics["followers_count"],
+                        "following_count": user.data.public_metrics["following_count"],
+                        "tweet_count": user.data.public_metrics["tweet_count"]
+                    },
+                    "success": True
+                }
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e)
+            }
+        return None
+
     def get_tweet_analytics(self, tweet_id: str) -> Optional[Dict[str, Any]]:
         """Get analytics for a specific tweet"""
         try:

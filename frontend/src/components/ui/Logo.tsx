@@ -14,19 +14,19 @@ const Logo = ({ href = '/dashboard', size = 'md', showText = true }: LogoProps) 
   };
 
   const logoContent = (
-    <div className="flex items-center space-x-2">
-      <div className={`${sizes[size].icon} bg-primary-600 rounded-lg flex items-center justify-center`}>
+    <div className="flex items-center space-x-2 select-none">
+      <div className={`${sizes[size].icon} bg-primary-600 rounded-lg flex items-center justify-center flex-shrink-0`}>
         <span className={`text-white font-bold ${size === 'sm' ? 'text-sm' : 'text-lg'}`}>A</span>
       </div>
       {showText && (
-        <span className={`${sizes[size].text} font-bold text-gray-900`}>AutoReach</span>
+        <span className={`${sizes[size].text} font-bold text-gray-900 whitespace-nowrap`}>AutoReach</span>
       )}
     </div>
   );
 
   if (href) {
     return (
-      <Link href={href} className="flex items-center space-x-2">
+      <Link href={href}>
         {logoContent}
       </Link>
     );
