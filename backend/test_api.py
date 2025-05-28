@@ -17,7 +17,7 @@ BASE_URL = "http://localhost:8000"
 def test_api_endpoints():
     """Test basic API endpoints"""
     print("🧪 Testing AutoReach API endpoints...")
-    
+
     # Test root endpoint
     print("\n1. Testing root endpoint...")
     try:
@@ -31,7 +31,7 @@ def test_api_endpoints():
     except Exception as e:
         print(f"❌ Root endpoint error: {e}")
         return False
-    
+
     # Test health endpoint
     print("\n2. Testing health endpoint...")
     try:
@@ -45,7 +45,7 @@ def test_api_endpoints():
     except Exception as e:
         print(f"❌ Health endpoint error: {e}")
         return False
-    
+
     # Test API docs
     print("\n3. Testing API documentation...")
     try:
@@ -58,22 +58,30 @@ def test_api_endpoints():
     except Exception as e:
         print(f"❌ API docs error: {e}")
         return False
-    
+
     return True
 
 def test_database_connection():
     """Test database connectivity through API"""
     print("\n🗄️ Testing database connectivity...")
-    
-    # Test users endpoint (should return empty list or error if no auth)
+
+    # Test a simple endpoint that uses the database
+    # Try to get a non-existent user (should return 404, which means DB is working)
     try:
-        response = requests.get(f"{BASE_URL}/api/users/")
-        print(f"Users endpoint status: {response.status_code}")
-        if response.status_code in [200, 401, 403]:  # Any of these means the endpoint is working
+        response = requests.get(f"{BASE_URL}/api/users/999999")
+        print(f"User lookup endpoint status: {response.status_code}")
+        if response.status_code == 404:  # Expected for non-existent user
             print("✅ Database connection through API is working")
+            return True
+        elif response.status_code in [401, 403]:  # Auth required but endpoint works
+            print("✅ Database connection through API is working (auth required)")
             return True
         else:
             print(f"❌ Unexpected response: {response.status_code}")
+            try:
+                print(f"Response: {response.json()}")
+            except:
+                print(f"Response text: {response.text}")
             return False
     except Exception as e:
         print(f"❌ Database test error: {e}")
@@ -82,18 +90,18 @@ def test_database_connection():
 if __name__ == "__main__":
     print("🚀 AutoReach API Test Suite")
     print("=" * 50)
-    
+
     # Test API endpoints
     api_success = test_api_endpoints()
-    
+
     # Test database
     db_success = test_database_connection()
-    
+
     print("\n" + "=" * 50)
     print("📊 Test Results:")
     print(f"API Endpoints: {'✅ PASS' if api_success else '❌ FAIL'}")
     print(f"Database: {'✅ PASS' if db_success else '❌ FAIL'}")
-    
+
     if api_success and db_success:
         print("\n🎉 All tests passed! Your AutoReach backend is ready!")
         print(f"🌐 API Documentation: {BASE_URL}/docs")
