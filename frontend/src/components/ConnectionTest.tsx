@@ -37,11 +37,10 @@ export default function ConnectionTest() {
     try {
       // Test 1: Backend Health Check
       try {
-        // Health endpoint is at /health, not /api/health
-        const response = await fetch('http://localhost:8000/health');
-        const health = await response.json();
-        if (health.status === 'healthy') {
-          updateTest(0, 'success', 'Backend is healthy');
+        // Use the API health endpoint
+        const health = await apiClient.get<{status: string, api?: string, version?: string}>('/health');
+        if (health && health.status === 'healthy') {
+          updateTest(0, 'success', `Backend is healthy (API: ${health.api || 'ready'})`);
         } else {
           updateTest(0, 'error', 'Backend health check failed');
         }

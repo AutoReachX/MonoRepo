@@ -36,6 +36,11 @@ app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"]
 app.include_router(content.router, prefix="/api/content", tags=["content"])
 app.include_router(scheduled_posts.router, prefix="/api/scheduled-posts", tags=["scheduled-posts"])
 
+# API health check endpoint
+@app.get("/api/health")
+async def api_health_check():
+    return {"status": "healthy", "version": "1.0.0", "api": "ready"}
+
 @app.get("/")
 async def root():
     return {"message": "Welcome to AutoReach API"}
