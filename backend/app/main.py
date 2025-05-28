@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 import os
 from dotenv import load_dotenv
 
-from app.api import auth, users, tweets, analytics
+from app.api import auth, users, tweets, analytics, content, scheduled_posts
 from app.core.config import settings
 
 # Load environment variables
@@ -33,6 +33,8 @@ app.include_router(auth.router, prefix="/api/auth", tags=["authentication"])
 app.include_router(users.router, prefix="/api/users", tags=["users"])
 app.include_router(tweets.router, prefix="/api/tweets", tags=["tweets"])
 app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
+app.include_router(content.router, prefix="/api/content", tags=["content"])
+app.include_router(scheduled_posts.router, prefix="/api/scheduled-posts", tags=["scheduled-posts"])
 
 @app.get("/")
 async def root():
