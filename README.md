@@ -1,8 +1,8 @@
 # AutoReach - Twitter Growth Platform
 
-
-to start back end: python start_server.py
-
+# Start independent parts 
+from the back end: python start_server.py
+from the front end: npm start
 
 A comprehensive platform for Twitter growth and engagement automation.
 

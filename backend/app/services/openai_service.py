@@ -77,11 +77,32 @@ class PromptBuilder:
 class OpenAIService(ContentGeneratorInterface):
     """OpenAI service implementing ContentGeneratorInterface"""
 
-    def __init__(self):
-        if not settings.OPENAI_API_KEY:
-            raise ValidationError("OpenAI API key is required")
-        self.client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
+    def __init__(self, api_key: Optional[str] = None, client: Optional[openai.OpenAI] = None):
+        """
+        Initialize OpenAI service with dependency injection support
+
+        Args:
+            api_key: OpenAI API key (defaults to settings if not provided)
+            client: Pre-configured OpenAI client (for testing)
+        """
+        self.api_key = api_key or settings.OPENAI_API_KEY
+
+        if client:
+            self.client = client
+        elif self.api_key:
+            self.client = openai.OpenAI(api_key=self.api_key)
+        else:
+            # Allow initialization without API key for testing
+            self.client = None
+
         self.prompt_builder = PromptBuilder()
+
+    def _ensure_client(self) -> None:
+        """Ensure client is initialized before use"""
+        if not self.client:
+            if not self.api_key:
+                raise ValidationError("OpenAI API key is required")
+            self.client = openai.OpenAI(api_key=self.api_key)
 
     async def generate_tweet(
         self,
@@ -92,6 +113,8 @@ class OpenAIService(ContentGeneratorInterface):
     ) -> Dict[str, Any]:
         """Generate a tweet based on topic and style"""
         try:
+            self._ensure_client()
+
             # Build the prompt
             prompt = self.prompt_builder.build_tweet_prompt(topic, style, user_context, language)
 
@@ -128,6 +151,8 @@ class OpenAIService(ContentGeneratorInterface):
     ) -> Dict[str, Any]:
         """Generate a Twitter thread"""
         try:
+            self._ensure_client()
+
             prompt = self.prompt_builder.build_thread_prompt(topic, num_tweets, style, language)
 
             response = self.client.chat.completions.create(
@@ -162,6 +187,8 @@ class OpenAIService(ContentGeneratorInterface):
     ) -> Dict[str, Any]:
         """Generate a reply to a tweet"""
         try:
+            self._ensure_client()
+
             prompt = self.prompt_builder.build_reply_prompt(original_tweet, reply_style, user_context, language)
 
             response = self.client.chat.completions.create(
@@ -188,5 +215,7 @@ class OpenAIService(ContentGeneratorInterface):
             raise OpenAIAPIError(f"Reply generation failed: {str(e)}", {"original_tweet": original_tweet, "reply_style": reply_style})
 
 
-# Global instance for dependency injection
-openai_service = OpenAIService()
+# Factory function for dependency injection
+def create_openai_service(api_key: Optional[str] = None, client: Optional[openai.OpenAI] = None) -> OpenAIService:
+    """Create an OpenAI service instance"""
+    return OpenAIService(api_key=api_key, client=client)

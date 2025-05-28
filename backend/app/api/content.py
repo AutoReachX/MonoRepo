@@ -62,7 +62,8 @@ async def generate_tweet(
             success=True,
             content=result["content"],
             prompt=result["prompt"],
-            tokens_used=result.get("tokens_used")
+            tokens_used=result.get("tokens_used"),
+            error=None
         )
 
     except (ValidationError, ContentGenerationError) as e:
@@ -95,7 +96,8 @@ async def generate_thread(
             success=True,
             content=result["content"],
             prompt=result["prompt"],
-            tokens_used=result.get("tokens_used")
+            tokens_used=result.get("tokens_used"),
+            error=None
         )
 
     except (ValidationError, ContentGenerationError) as e:
@@ -128,7 +130,8 @@ async def generate_reply(
             success=True,
             content=result["content"],
             prompt=result["prompt"],
-            tokens_used=result.get("tokens_used")
+            tokens_used=result.get("tokens_used"),
+            error=None
         )
 
     except (ValidationError, ContentGenerationError) as e:
@@ -147,6 +150,12 @@ async def get_content_history(
     db: Session = Depends(get_db)
 ):
     """Get user's content generation history"""
+    # Get total count
+    total = db.query(ContentLog).filter(
+        ContentLog.user_id == current_user.id
+    ).count()
+
+    # Get paginated results
     content_logs = db.query(ContentLog).filter(
         ContentLog.user_id == current_user.id
     ).order_by(ContentLog.created_at.desc()).offset(skip).limit(limit).all()
@@ -161,5 +170,6 @@ async def get_content_history(
                 "created_at": log.created_at
             }
             for log in content_logs
-        ]
+        ],
+        "total": total
     }
