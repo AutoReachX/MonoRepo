@@ -1,0 +1,23 @@
+AutoReach/
+├── frontend/                # React + Tailwind CSS frontend
+│   ├── public/              # Static assets
+│   ├── src/                 # React components and logic
+│   ├── package.json         # Frontend dependencies
+│   └── tailwind.config.js   # Tailwind configuration
+├── backend/                 # FastAPI backend
+│   ├── app/                 # Main application code
+│   │   ├── api/             # API endpoints
+│   │   ├── core/            # Core business logic
+│   │   ├── models/          # Database models
+│   │   ├── services/        # External service integrations
+│   │   └── main.py          # FastAPI application entry point
+│   ├── tests/               # Backend tests
+│   ├── requirements.txt     # Python dependencies
+│   └── Dockerfile           # Backend container definition
+├── infrastructure/          # IaC and deployment configs
+│   ├── render/              # Render.com configuration
+│   └── docker-compose.yml   # Local development setup
+├── docs/                    # Documentation
+├── .github/                 # GitHub Actions workflows
+├── .gitignore               # Git ignore file
+└── README.md                # Project overview
