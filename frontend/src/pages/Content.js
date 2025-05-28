@@ -1,28 +1,34 @@
 import React, { useState } from 'react';
+import { useContentGeneration } from '../hooks/useContentGeneration';
+import ContentGenerationForm from '../components/ContentGeneration/ContentGenerationForm';
+import GeneratedContentDisplay from '../components/ContentGeneration/GeneratedContentDisplay';
 
 const Content = () => {
   const [activeTab, setActiveTab] = useState('generate');
-  const [topic, setTopic] = useState('');
-  const [style, setStyle] = useState('engaging');
-  const [generatedContent, setGeneratedContent] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
+  const {
+    isGenerating,
+    error,
+    lastGenerated,
+    generateTweet,
+    clearError,
+    clearLastGenerated
+  } = useContentGeneration();
 
-  const handleGenerateContent = async () => {
-    if (!topic.trim()) return;
+  const handleGenerateContent = async (requestData) => {
+    clearError();
+    await generateTweet(requestData);
+  };
 
-    setIsGenerating(true);
-    try {
-      // This would call your API
-      // const response = await fetch('/api/content/generate-tweet', { ... });
-      // For now, simulate API call
-      setTimeout(() => {
-        setGeneratedContent(`🚀 Exciting insights about ${topic}! This AI-generated tweet showcases the power of automation in social media. #${topic.replace(/\s+/g, '')} #AI #SocialMedia`);
-        setIsGenerating(false);
-      }, 2000);
-    } catch (error) {
-      console.error('Generation failed:', error);
-      setIsGenerating(false);
-    }
+  const handleEditContent = (newContent) => {
+    // Update the generated content with edited version
+    // This could be enhanced to save drafts
+    console.log('Content edited:', newContent);
+  };
+
+  const handleScheduleContent = (content) => {
+    // Navigate to scheduling interface or open modal
+    console.log('Schedule content:', content);
+    // You could navigate to a scheduling page or open a modal here
   };
 
   return (
@@ -46,75 +52,26 @@ const Content = () => {
       </div>
 
       {activeTab === 'generate' && (
-        <div className="card">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">AI Content Generation</h2>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Topic or Theme
-              </label>
-              <input
-                type="text"
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                className="input-field"
-                placeholder="e.g., AI in marketing, productivity tips, startup advice"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Style
-              </label>
-              <select
-                value={style}
-                onChange={(e) => setStyle(e.target.value)}
-                className="input-field"
-              >
-                <option value="engaging">Engaging</option>
-                <option value="professional">Professional</option>
-                <option value="casual">Casual</option>
-                <option value="educational">Educational</option>
-                <option value="humorous">Humorous</option>
-              </select>
-            </div>
-
-            <button
-              onClick={handleGenerateContent}
-              disabled={!topic.trim() || isGenerating}
-              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isGenerating ? (
-                <span className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Generating...
-                </span>
-              ) : (
-                '✨ Generate Content'
-              )}
-            </button>
-
-            {generatedContent && (
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <h3 className="font-medium text-blue-900 mb-2">Generated Content:</h3>
-                <p className="text-blue-800 mb-4">{generatedContent}</p>
-                <div className="flex space-x-2">
-                  <button className="btn-primary text-sm">Schedule Post</button>
-                  <button className="btn-secondary text-sm">Post Now</button>
-                  <button
-                    onClick={() => setGeneratedContent('')}
-                    className="btn-secondary text-sm"
-                  >
-                    Clear
-                  </button>
-                </div>
-              </div>
-            )}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Generation Form */}
+          <div className="card">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">AI Content Generation</h2>
+            <ContentGenerationForm
+              onGenerate={handleGenerateContent}
+              isGenerating={isGenerating}
+              error={error}
+            />
           </div>
+
+          {/* Generated Content Display */}
+          {lastGenerated && (
+            <GeneratedContentDisplay
+              content={lastGenerated}
+              onEdit={handleEditContent}
+              onSchedule={handleScheduleContent}
+              onClear={clearLastGenerated}
+            />
+          )}
         </div>
       )}
 

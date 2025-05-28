@@ -1,34 +1,36 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from typing import Optional, List
-from datetime import datetime
+from typing import Optional
 
 from app.core.database import get_db
 from app.models.user import User
 from app.models.content_log import ContentLog
 from app.api.auth import get_current_user
-from app.services.openai_service import openai_service
+from app.core.exceptions import handle_exception, ValidationError, ContentGenerationError
+from app.core.constants import ContentConstants
+from app.core.dependencies import get_content_service
+from app.services.content_service import ContentService
 
 router = APIRouter()
 
 class ContentGenerationRequest(BaseModel):
     topic: str
-    style: Optional[str] = "engaging"
+    style: Optional[str] = ContentConstants.DEFAULT_STYLE
     user_context: Optional[str] = None
-    language: Optional[str] = "en"
+    language: Optional[str] = ContentConstants.DEFAULT_LANGUAGE
 
 class ThreadGenerationRequest(BaseModel):
     topic: str
     num_tweets: Optional[int] = 3
     style: Optional[str] = "informative"
-    language: Optional[str] = "en"
+    language: Optional[str] = ContentConstants.DEFAULT_LANGUAGE
 
 class ReplyGenerationRequest(BaseModel):
     original_tweet: str
     reply_style: Optional[str] = "helpful"
     user_context: Optional[str] = None
-    language: Optional[str] = "en"
+    language: Optional[str] = ContentConstants.DEFAULT_LANGUAGE
 
 class ContentResponse(BaseModel):
     success: bool
@@ -41,41 +43,30 @@ class ContentResponse(BaseModel):
 async def generate_tweet(
     request: ContentGenerationRequest,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    content_service: ContentService = Depends(get_content_service)
 ):
     """Generate a tweet using AI"""
     try:
-        # Generate content using OpenAI
-        result = await openai_service.generate_tweet(
+        # Use content service to handle the generation
+        result = await content_service.generate_tweet(
             topic=request.topic,
             style=request.style,
             user_context=request.user_context,
-            language=request.language or current_user.language_pref
+            language=request.language or current_user.language_pref,
+            user=current_user,
+            db=db
         )
-        
-        if result["success"]:
-            # Log the generation
-            content_log = ContentLog(
-                user_id=current_user.id,
-                prompt=result["prompt"],
-                generated_text=result["content"],
-                mode="new_tweet"
-            )
-            db.add(content_log)
-            db.commit()
-            
-            return ContentResponse(
-                success=True,
-                content=result["content"],
-                prompt=result["prompt"],
-                tokens_used=result.get("tokens_used")
-            )
-        else:
-            return ContentResponse(
-                success=False,
-                error=result["error"]
-            )
-            
+
+        return ContentResponse(
+            success=True,
+            content=result["content"],
+            prompt=result["prompt"],
+            tokens_used=result.get("tokens_used")
+        )
+
+    except (ValidationError, ContentGenerationError) as e:
+        raise handle_exception(e)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -86,40 +77,29 @@ async def generate_tweet(
 async def generate_thread(
     request: ThreadGenerationRequest,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    content_service: ContentService = Depends(get_content_service)
 ):
     """Generate a Twitter thread using AI"""
     try:
-        result = await openai_service.generate_thread(
+        result = await content_service.generate_thread(
             topic=request.topic,
             num_tweets=request.num_tweets,
             style=request.style,
-            language=request.language or current_user.language_pref
+            language=request.language or current_user.language_pref,
+            user=current_user,
+            db=db
         )
-        
-        if result["success"]:
-            # Log the generation
-            content_log = ContentLog(
-                user_id=current_user.id,
-                prompt=result["prompt"],
-                generated_text=result["content"],
-                mode="thread"
-            )
-            db.add(content_log)
-            db.commit()
-            
-            return ContentResponse(
-                success=True,
-                content=result["content"],
-                prompt=result["prompt"],
-                tokens_used=result.get("tokens_used")
-            )
-        else:
-            return ContentResponse(
-                success=False,
-                error=result["error"]
-            )
-            
+
+        return ContentResponse(
+            success=True,
+            content=result["content"],
+            prompt=result["prompt"],
+            tokens_used=result.get("tokens_used")
+        )
+
+    except (ValidationError, ContentGenerationError) as e:
+        raise handle_exception(e)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -130,40 +110,29 @@ async def generate_thread(
 async def generate_reply(
     request: ReplyGenerationRequest,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    content_service: ContentService = Depends(get_content_service)
 ):
     """Generate a reply to a tweet using AI"""
     try:
-        result = await openai_service.generate_reply(
+        result = await content_service.generate_reply(
             original_tweet=request.original_tweet,
             reply_style=request.reply_style,
             user_context=request.user_context,
-            language=request.language or current_user.language_pref
+            language=request.language or current_user.language_pref,
+            user=current_user,
+            db=db
         )
-        
-        if result["success"]:
-            # Log the generation
-            content_log = ContentLog(
-                user_id=current_user.id,
-                prompt=result["prompt"],
-                generated_text=result["content"],
-                mode="reply"
-            )
-            db.add(content_log)
-            db.commit()
-            
-            return ContentResponse(
-                success=True,
-                content=result["content"],
-                prompt=result["prompt"],
-                tokens_used=result.get("tokens_used")
-            )
-        else:
-            return ContentResponse(
-                success=False,
-                error=result["error"]
-            )
-            
+
+        return ContentResponse(
+            success=True,
+            content=result["content"],
+            prompt=result["prompt"],
+            tokens_used=result.get("tokens_used")
+        )
+
+    except (ValidationError, ContentGenerationError) as e:
+        raise handle_exception(e)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -181,7 +150,7 @@ async def get_content_history(
     content_logs = db.query(ContentLog).filter(
         ContentLog.user_id == current_user.id
     ).order_by(ContentLog.created_at.desc()).offset(skip).limit(limit).all()
-    
+
     return {
         "history": [
             {
