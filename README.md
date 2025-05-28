@@ -39,27 +39,44 @@ AutoReach/
 
 ### Quick Start
 
-1. **Set up Render databases** (PostgreSQL + Redis)
-2. **Copy environment variables:**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your Render database URLs
-   ```
+**🚀 Automated Setup (Recommended):**
+```bash
+# 1. Run the setup script
+setup-dev.bat
 
-3. **Backend Setup:**
+# 2. Configure your API keys in .env file
+# 3. Start the development servers
+quick-start.bat
+```
+
+**📋 Manual Setup:**
+1. **Set up Render databases** (PostgreSQL + Redis)
+2. **Install dependencies:**
    ```bash
+   # Backend
    cd backend
    python -m venv venv
-   venv\Scripts\activate  # Windows
+   venv\Scripts\activate
    pip install -r requirements.txt
-   uvicorn app.main:app --reload
-   ```
 
-4. **Frontend Setup:**
-   ```bash
+   # Frontend
    cd frontend
    npm install
-   npm start
+   ```
+
+3. **Configure environment:**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your API keys and database URLs
+   ```
+
+4. **Start servers:**
+   ```bash
+   # Backend: http://localhost:8000
+   start-backend.bat
+
+   # Frontend: http://localhost:3000
+   start-frontend.bat
    ```
 
 ### Detailed Setup Guide
