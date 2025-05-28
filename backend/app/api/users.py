@@ -16,15 +16,14 @@ class UserCreate(BaseModel):
     full_name: Optional[str] = None
 
 class UserResponse(BaseModel):
+    model_config = {"from_attributes": True}
+
     id: int
     username: str
     email: str
     full_name: Optional[str]
     is_active: bool
     twitter_username: Optional[str]
-    
-    class Config:
-        from_attributes = True
 
 class UserUpdate(BaseModel):
     full_name: Optional[str] = None
@@ -41,7 +40,7 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db)):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username or email already registered"
         )
-    
+
     # Create new user
     hashed_password = get_password_hash(user.password)
     db_user = User(
@@ -67,7 +66,7 @@ async def update_user_me(
 ):
     for field, value in user_update.dict(exclude_unset=True).items():
         setattr(current_user, field, value)
-    
+
     db.commit()
     db.refresh(current_user)
     return current_user

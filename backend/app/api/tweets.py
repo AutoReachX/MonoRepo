@@ -16,6 +16,8 @@ class TweetCreate(BaseModel):
     scheduled_at: Optional[datetime] = None
 
 class TweetResponse(BaseModel):
+    model_config = {"from_attributes": True}
+
     id: int
     content: str
     status: str
@@ -26,9 +28,6 @@ class TweetResponse(BaseModel):
     retweets_count: int
     replies_count: int
     created_at: datetime
-    
-    class Config:
-        from_attributes = True
 
 class TweetUpdate(BaseModel):
     content: Optional[str] = None
@@ -89,15 +88,15 @@ async def update_tweet(
     ).first()
     if tweet is None:
         raise HTTPException(status_code=404, detail="Tweet not found")
-    
+
     for field, value in tweet_update.dict(exclude_unset=True).items():
         setattr(tweet, field, value)
-    
+
     # Update scheduling status
     if tweet_update.scheduled_at is not None:
         tweet.is_scheduled = True
         tweet.status = "scheduled"
-    
+
     db.commit()
     db.refresh(tweet)
     return tweet
@@ -114,7 +113,7 @@ async def delete_tweet(
     ).first()
     if tweet is None:
         raise HTTPException(status_code=404, detail="Tweet not found")
-    
+
     db.delete(tweet)
     db.commit()
     return {"message": "Tweet deleted successfully"}
