@@ -8,7 +8,7 @@ import ContentDisplay from '@/components/content/ContentDisplay';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 
 const ContentGeneration = () => {
-  const { generateContent, isGenerating, error } = useContentGeneration();
+  const { generateContent, isLoading, errorState } = useContentGeneration();
   const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
 
   const handleFormSubmit = async (formData: ContentRequest) => {
@@ -37,8 +37,8 @@ const ContentGeneration = () => {
         <CardContent>
           <ContentForm
             onSubmit={handleFormSubmit}
-            isLoading={isGenerating}
-            error={error}
+            isLoading={isLoading}
+            error={errorState.error?.message}
           />
         </CardContent>
       </Card>

@@ -4,6 +4,8 @@ Following KISS principle by centralizing configuration values.
 """
 
 # OpenAI Configuration
+
+
 class OpenAIConstants:
     DEFAULT_MODEL = "gpt-4"
     TWEET_MAX_TOKENS = 280

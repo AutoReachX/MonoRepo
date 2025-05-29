@@ -26,10 +26,10 @@ os.environ["TWITTER_ACCESS_TOKEN"] = ""  # Empty for testing
 os.environ["TWITTER_ACCESS_TOKEN_SECRET"] = ""  # Empty for testing
 os.environ["TWITTER_BEARER_TOKEN"] = ""  # Empty for testing
 
-from app.main import app
-from app.core.database import Base, get_db
-from app.services.openai_service import create_openai_service
-from app.services.twitter_service import create_twitter_service
+from app.main import app  # noqa: E402
+from app.core.database import Base, get_db  # noqa: E402
+from app.services.openai_service import create_openai_service  # noqa: E402
+from app.services.twitter_service import create_twitter_service  # noqa: E402
 
 
 # Test database setup

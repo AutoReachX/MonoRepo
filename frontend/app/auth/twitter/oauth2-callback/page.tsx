@@ -9,11 +9,14 @@ export default function TwitterOAuth2CallbackPage() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
-  const [user, setUser] = useState<{ id: string; username: string; name: string } | null>(null);
-
-  useEffect(() => {
-    handleTwitterOAuth2Callback();
-  }, [handleTwitterOAuth2Callback]);
+  const [user, setUser] = useState<{
+    id: number;
+    username: string;
+    twitter_username: string;
+    twitter_user_id: string;
+    full_name?: string;
+    is_active: boolean;
+  } | null>(null);
 
   const handleTwitterOAuth2Callback = useCallback(async () => {
     try {
@@ -78,6 +81,10 @@ export default function TwitterOAuth2CallbackPage() {
       setTimeout(() => router.push('/'), 3000);
     }
   }, [searchParams, router]);
+
+  useEffect(() => {
+    handleTwitterOAuth2Callback();
+  }, [handleTwitterOAuth2Callback]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

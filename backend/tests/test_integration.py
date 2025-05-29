@@ -4,11 +4,11 @@ Integration tests for AutoReach API
 Tests the complete flow from frontend to backend
 """
 
-import pytest
+import pytest  # noqa: F401
 import requests
-import json
-import time
-from typing import Dict, Any
+import json  # noqa: F401
+import time  # noqa: F401
+from typing import Dict, Any  # noqa: F401
 
 # Test configuration
 BASE_URL = "http://localhost:8000"
@@ -18,6 +18,7 @@ TEST_USER = {
     "password": "testpass123",
     "full_name": "Test User"
 }
+
 
 class TestAPIIntegration:
     """Test API integration and data flow"""
@@ -158,6 +159,7 @@ class TestAPIIntegration:
 
         response = self.session.get(f"{self.base_url}/redoc")
         assert response.status_code == 200
+
 
 if __name__ == "__main__":
     # Run tests manually

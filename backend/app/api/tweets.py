@@ -11,9 +11,11 @@ from app.api.auth import get_current_user
 
 router = APIRouter()
 
+
 class TweetCreate(BaseModel):
     content: str
     scheduled_at: Optional[datetime] = None
+
 
 class TweetResponse(BaseModel):
     model_config = {"from_attributes": True}
@@ -29,9 +31,11 @@ class TweetResponse(BaseModel):
     replies_count: int
     created_at: datetime
 
+
 class TweetUpdate(BaseModel):
     content: Optional[str] = None
     scheduled_at: Optional[datetime] = None
+
 
 @router.post("/", response_model=TweetResponse, status_code=status.HTTP_201_CREATED)
 async def create_tweet(
@@ -51,6 +55,7 @@ async def create_tweet(
     db.refresh(db_tweet)
     return db_tweet
 
+
 @router.get("/", response_model=List[TweetResponse])
 async def read_tweets(
     skip: int = 0,
@@ -60,6 +65,7 @@ async def read_tweets(
 ):
     tweets = db.query(Tweet).filter(Tweet.user_id == current_user.id).offset(skip).limit(limit).all()
     return tweets
+
 
 @router.get("/{tweet_id}", response_model=TweetResponse)
 async def read_tweet(
@@ -74,6 +80,7 @@ async def read_tweet(
     if tweet is None:
         raise HTTPException(status_code=404, detail="Tweet not found")
     return tweet
+
 
 @router.put("/{tweet_id}", response_model=TweetResponse)
 async def update_tweet(
@@ -100,6 +107,7 @@ async def update_tweet(
     db.commit()
     db.refresh(tweet)
     return tweet
+
 
 @router.delete("/{tweet_id}")
 async def delete_tweet(

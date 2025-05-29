@@ -12,10 +12,6 @@ export default function TwitterCallbackPage() {
   const [message, setMessage] = useState('');
   const [twitterUsername, setTwitterUsername] = useState<string | null>(null);
 
-  useEffect(() => {
-    handleTwitterCallback();
-  }, [handleTwitterCallback]);
-
   const handleTwitterCallback = useCallback(async () => {
     try {
       // Check if user is authenticated
@@ -78,6 +74,10 @@ export default function TwitterCallbackPage() {
       setTimeout(() => router.push('/settings'), 3000);
     }
   }, [searchParams, router]);
+
+  useEffect(() => {
+    handleTwitterCallback();
+  }, [handleTwitterCallback]);
 
   const getStatusIcon = () => {
     switch (status) {

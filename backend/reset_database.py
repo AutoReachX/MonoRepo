@@ -4,14 +4,14 @@ Reset Database Script
 Drops all tables and recreates them with the current schema
 """
 
+from app.core.database import engine, Base
+from sqlalchemy import text
 import sys
 import os
 
 # Add the backend directory to the Python path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from sqlalchemy import text
-from app.core.database import engine, Base
 
 def reset_database():
     """Drop all tables and recreate them"""
@@ -53,6 +53,7 @@ def reset_database():
     except Exception as e:
         print(f"❌ Error resetting database: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     reset_database()

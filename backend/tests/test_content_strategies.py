@@ -17,12 +17,12 @@ from app.core.interfaces import ContentGeneratorInterface
 
 class TestTweetGenerationStrategy:
     """Test TweetGenerationStrategy"""
-    
+
     def setup_method(self):
         """Set up test fixtures"""
         self.mock_generator = Mock(spec=ContentGeneratorInterface)
         self.strategy = TweetGenerationStrategy(self.mock_generator)
-    
+
     @pytest.mark.asyncio
     async def test_generate_tweet_success(self):
         """Test successful tweet generation"""
@@ -32,7 +32,7 @@ class TestTweetGenerationStrategy:
             "prompt": "Test prompt",
             "tokens_used": 50
         })
-        
+
         # Act
         result = await self.strategy.generate(
             topic="AI trends",
@@ -40,7 +40,7 @@ class TestTweetGenerationStrategy:
             user_context="Additional context",
             language="en"
         )
-        
+
         # Assert
         assert isinstance(result, ContentGenerationResult)
         assert result.content == "Generated tweet content"
@@ -49,14 +49,14 @@ class TestTweetGenerationStrategy:
         assert result.metadata["type"] == "tweet"
         assert result.metadata["style"] == "engaging"
         assert result.metadata["language"] == "en"
-        
+
         self.mock_generator.generate_tweet.assert_called_once_with(
             topic="AI trends",
             style="engaging",
             user_context="Additional context",
             language="en"
         )
-    
+
     def test_validate_parameters_valid(self):
         """Test parameter validation with valid parameters"""
         result = self.strategy.validate_parameters(
@@ -65,7 +65,7 @@ class TestTweetGenerationStrategy:
             language="en"
         )
         assert result is True
-    
+
     def test_validate_parameters_missing_required(self):
         """Test parameter validation with missing required parameters"""
         result = self.strategy.validate_parameters(
@@ -74,7 +74,7 @@ class TestTweetGenerationStrategy:
             # Missing language
         )
         assert result is False
-    
+
     @pytest.mark.asyncio
     async def test_generate_invalid_parameters(self):
         """Test generation with invalid parameters"""
@@ -88,12 +88,12 @@ class TestTweetGenerationStrategy:
 
 class TestThreadGenerationStrategy:
     """Test ThreadGenerationStrategy"""
-    
+
     def setup_method(self):
         """Set up test fixtures"""
         self.mock_generator = Mock(spec=ContentGeneratorInterface)
         self.strategy = ThreadGenerationStrategy(self.mock_generator)
-    
+
     @pytest.mark.asyncio
     async def test_generate_thread_success(self):
         """Test successful thread generation"""
@@ -103,7 +103,7 @@ class TestThreadGenerationStrategy:
             "prompt": "Thread prompt",
             "tokens_used": 150
         })
-        
+
         # Act
         result = await self.strategy.generate(
             topic="AI trends",
@@ -111,7 +111,7 @@ class TestThreadGenerationStrategy:
             style="informative",
             language="en"
         )
-        
+
         # Assert
         assert isinstance(result, ContentGenerationResult)
         assert result.content == "Generated thread content"
@@ -121,14 +121,14 @@ class TestThreadGenerationStrategy:
         assert result.metadata["num_tweets"] == 5
         assert result.metadata["style"] == "informative"
         assert result.metadata["language"] == "en"
-        
+
         self.mock_generator.generate_thread.assert_called_once_with(
             topic="AI trends",
             num_tweets=5,
             style="informative",
             language="en"
         )
-    
+
     def test_validate_parameters_valid(self):
         """Test parameter validation with valid parameters"""
         result = self.strategy.validate_parameters(
@@ -138,7 +138,7 @@ class TestThreadGenerationStrategy:
             language="en"
         )
         assert result is True
-    
+
     def test_validate_parameters_default_num_tweets(self):
         """Test parameter validation with default num_tweets"""
         result = self.strategy.validate_parameters(
@@ -147,7 +147,7 @@ class TestThreadGenerationStrategy:
             language="en"
         )
         assert result is True
-    
+
     def test_validate_parameters_invalid_num_tweets_too_small(self):
         """Test parameter validation with invalid num_tweets (too small)"""
         result = self.strategy.validate_parameters(
@@ -157,7 +157,7 @@ class TestThreadGenerationStrategy:
             language="en"
         )
         assert result is False
-    
+
     def test_validate_parameters_invalid_num_tweets_too_large(self):
         """Test parameter validation with invalid num_tweets (too large)"""
         result = self.strategy.validate_parameters(
@@ -167,7 +167,7 @@ class TestThreadGenerationStrategy:
             language="en"
         )
         assert result is False
-    
+
     def test_validate_parameters_invalid_num_tweets_type(self):
         """Test parameter validation with invalid num_tweets type"""
         result = self.strategy.validate_parameters(
@@ -181,12 +181,12 @@ class TestThreadGenerationStrategy:
 
 class TestReplyGenerationStrategy:
     """Test ReplyGenerationStrategy"""
-    
+
     def setup_method(self):
         """Set up test fixtures"""
         self.mock_generator = Mock(spec=ContentGeneratorInterface)
         self.strategy = ReplyGenerationStrategy(self.mock_generator)
-    
+
     @pytest.mark.asyncio
     async def test_generate_reply_success(self):
         """Test successful reply generation"""
@@ -196,7 +196,7 @@ class TestReplyGenerationStrategy:
             "prompt": "Reply prompt",
             "tokens_used": 75
         })
-        
+
         # Act
         result = await self.strategy.generate(
             original_tweet="This is an interesting tweet about AI",
@@ -204,7 +204,7 @@ class TestReplyGenerationStrategy:
             user_context="Additional context",
             language="en"
         )
-        
+
         # Assert
         assert isinstance(result, ContentGenerationResult)
         assert result.content == "Generated reply content"
@@ -214,14 +214,14 @@ class TestReplyGenerationStrategy:
         assert result.metadata["reply_style"] == "helpful"
         assert result.metadata["language"] == "en"
         assert "original_tweet_preview" in result.metadata
-        
+
         self.mock_generator.generate_reply.assert_called_once_with(
             original_tweet="This is an interesting tweet about AI",
             reply_style="helpful",
             user_context="Additional context",
             language="en"
         )
-    
+
     def test_validate_parameters_valid(self):
         """Test parameter validation with valid parameters"""
         result = self.strategy.validate_parameters(
@@ -230,7 +230,7 @@ class TestReplyGenerationStrategy:
             language="en"
         )
         assert result is True
-    
+
     def test_validate_parameters_missing_required(self):
         """Test parameter validation with missing required parameters"""
         result = self.strategy.validate_parameters(
@@ -243,12 +243,12 @@ class TestReplyGenerationStrategy:
 
 class TestContentGenerationContext:
     """Test ContentGenerationContext"""
-    
+
     def setup_method(self):
         """Set up test fixtures"""
         self.mock_generator = Mock(spec=ContentGeneratorInterface)
         self.context = ContentGenerationContext(self.mock_generator)
-    
+
     @pytest.mark.asyncio
     async def test_generate_content_tweet(self):
         """Test generating tweet content through context"""
@@ -258,7 +258,7 @@ class TestContentGenerationContext:
             "prompt": "Test prompt",
             "tokens_used": 50
         })
-        
+
         # Act
         result = await self.context.generate_content(
             "tweet",
@@ -266,12 +266,12 @@ class TestContentGenerationContext:
             style="engaging",
             language="en"
         )
-        
+
         # Assert
         assert isinstance(result, ContentGenerationResult)
         assert result.content == "Generated tweet content"
         assert result.metadata["type"] == "tweet"
-    
+
     @pytest.mark.asyncio
     async def test_generate_content_thread(self):
         """Test generating thread content through context"""
@@ -281,7 +281,7 @@ class TestContentGenerationContext:
             "prompt": "Thread prompt",
             "tokens_used": 150
         })
-        
+
         # Act
         result = await self.context.generate_content(
             "thread",
@@ -290,12 +290,12 @@ class TestContentGenerationContext:
             style="informative",
             language="en"
         )
-        
+
         # Assert
         assert isinstance(result, ContentGenerationResult)
         assert result.content == "Generated thread content"
         assert result.metadata["type"] == "thread"
-    
+
     @pytest.mark.asyncio
     async def test_generate_content_reply(self):
         """Test generating reply content through context"""
@@ -305,7 +305,7 @@ class TestContentGenerationContext:
             "prompt": "Reply prompt",
             "tokens_used": 75
         })
-        
+
         # Act
         result = await self.context.generate_content(
             "reply",
@@ -313,12 +313,12 @@ class TestContentGenerationContext:
             reply_style="helpful",
             language="en"
         )
-        
+
         # Assert
         assert isinstance(result, ContentGenerationResult)
         assert result.content == "Generated reply content"
         assert result.metadata["type"] == "reply"
-    
+
     @pytest.mark.asyncio
     async def test_generate_content_unsupported_type(self):
         """Test generating content with unsupported type"""
@@ -327,23 +327,23 @@ class TestContentGenerationContext:
                 "unsupported_type",
                 topic="AI trends"
             )
-    
+
     def test_add_strategy(self):
         """Test adding new strategy to context"""
         # Arrange
         custom_strategy = Mock()
-        
+
         # Act
         self.context.add_strategy("custom", custom_strategy)
-        
+
         # Assert
         assert "custom" in self.context._strategies
         assert self.context._strategies["custom"] == custom_strategy
-    
+
     def test_get_supported_types(self):
         """Test getting supported content types"""
         supported_types = self.context.get_supported_types()
-        
+
         assert "tweet" in supported_types
         assert "thread" in supported_types
         assert "reply" in supported_types

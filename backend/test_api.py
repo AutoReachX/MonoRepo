@@ -5,7 +5,7 @@ Tests basic functionality and database connectivity
 """
 
 import requests
-import json
+import json  # noqa: F401
 import sys
 from dotenv import load_dotenv
 
@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 BASE_URL = "http://localhost:8000"
+
 
 def test_api_endpoints():
     """Test basic API endpoints"""
@@ -61,6 +62,7 @@ def test_api_endpoints():
 
     return True
 
+
 def test_database_connection():
     """Test database connectivity through API"""
     print("\n🗄️ Testing database connectivity...")
@@ -80,12 +82,13 @@ def test_database_connection():
             print(f"❌ Unexpected response: {response.status_code}")
             try:
                 print(f"Response: {response.json()}")
-            except:
+            except BaseException:
                 print(f"Response text: {response.text}")
             return False
     except Exception as e:
         print(f"❌ Database test error: {e}")
         return False
+
 
 if __name__ == "__main__":
     print("🚀 AutoReach API Test Suite")

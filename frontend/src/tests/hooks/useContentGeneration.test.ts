@@ -133,7 +133,7 @@ describe('useContentGeneration', () => {
   });
 
   it('should set loading state during generation', async () => {
-    let resolvePromise: (value: any) => void;
+    let resolvePromise: (value: unknown) => void;
     const mockPromise = new Promise((resolve) => {
       resolvePromise = resolve;
     });

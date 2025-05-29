@@ -9,7 +9,7 @@ from typing import Optional, Dict, Any
 
 class AutoReachException(Exception):
     """Base exception for AutoReach application"""
-    
+
     def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
         self.message = message
         self.details = details or {}

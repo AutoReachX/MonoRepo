@@ -21,7 +21,7 @@ class ContentGenerationRequest:
     user: User
     db: Session
     user_context: Optional[str] = None
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for API responses"""
         return {
@@ -44,7 +44,7 @@ class ThreadGenerationRequest:
     language: str
     user: User
     db: Session
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for API responses"""
         return {
@@ -67,7 +67,7 @@ class ReplyGenerationRequest:
     user: User
     db: Session
     user_context: Optional[str] = None
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for API responses"""
         return {
@@ -88,7 +88,7 @@ class ContentGenerationResult:
     prompt: str
     tokens_used: Optional[int] = None
     metadata: Optional[Dict[str, Any]] = None
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for API responses"""
         result = {
@@ -112,7 +112,7 @@ class ValidationContext:
     value: Any
     rules: Dict[str, Any]
     user_context: Optional[Dict[str, Any]] = None
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for logging/debugging"""
         return {

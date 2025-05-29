@@ -5,7 +5,6 @@ Handles ONLY content generation logic, not logging or other concerns.
 
 from typing import Dict, Any, Optional
 from app.core.interfaces import ContentGeneratorInterface
-from app.core.exceptions import ContentGenerationError
 from app.core.error_handlers import ServiceErrorHandler
 
 
@@ -14,11 +13,11 @@ class ContentGenerationService:
     Service responsible ONLY for content generation.
     Follows Single Responsibility Principle.
     """
-    
+
     def __init__(self, content_generator: ContentGeneratorInterface):
         self.content_generator = content_generator
         self.error_handler = ServiceErrorHandler(__name__)
-    
+
     async def generate_tweet(
         self,
         topic: str,
@@ -35,10 +34,10 @@ class ContentGenerationService:
                 language=language
             )
             return result
-            
+
         except Exception as e:
             self.error_handler.handle_generation_error(e, "tweet generation")
-    
+
     async def generate_thread(
         self,
         topic: str,
@@ -55,10 +54,10 @@ class ContentGenerationService:
                 language=language
             )
             return result
-            
+
         except Exception as e:
             self.error_handler.handle_generation_error(e, "thread generation")
-    
+
     async def generate_reply(
         self,
         original_tweet: str,
@@ -75,7 +74,7 @@ class ContentGenerationService:
                 language=language
             )
             return result
-            
+
         except Exception as e:
             self.error_handler.handle_generation_error(e, "reply generation")
 

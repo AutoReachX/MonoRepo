@@ -12,9 +12,11 @@ from app.core.dependencies import get_twitter_service
 
 router = APIRouter()
 
+
 class ScheduledPostCreate(BaseModel):
     content: str
     scheduled_time: datetime
+
 
 class ScheduledPostResponse(BaseModel):
     model_config = {"from_attributes": True}
@@ -26,9 +28,11 @@ class ScheduledPostResponse(BaseModel):
     tweet_id: Optional[str]
     created_at: datetime
 
+
 class ScheduledPostUpdate(BaseModel):
     content: Optional[str] = None
     scheduled_time: Optional[datetime] = None
+
 
 @router.post("/", response_model=ScheduledPostResponse, status_code=status.HTTP_201_CREATED)
 async def create_scheduled_post(
@@ -57,6 +61,7 @@ async def create_scheduled_post(
 
     return db_post
 
+
 @router.get("/", response_model=List[ScheduledPostResponse])
 async def get_scheduled_posts(
     skip: int = 0,
@@ -81,6 +86,7 @@ async def get_scheduled_posts(
     posts = query.order_by(ScheduledPost.scheduled_time.asc()).offset(skip).limit(limit).all()
     return posts
 
+
 @router.get("/{post_id}", response_model=ScheduledPostResponse)
 async def get_scheduled_post(
     post_id: int,
@@ -100,6 +106,7 @@ async def get_scheduled_post(
         )
 
     return post
+
 
 @router.put("/{post_id}", response_model=ScheduledPostResponse)
 async def update_scheduled_post(
@@ -140,6 +147,7 @@ async def update_scheduled_post(
     db.refresh(post)
     return post
 
+
 @router.delete("/{post_id}")
 async def delete_scheduled_post(
     post_id: int,
@@ -169,12 +177,13 @@ async def delete_scheduled_post(
     db.commit()
     return {"message": "Scheduled post deleted successfully"}
 
+
 @router.post("/{post_id}/post-now")
 async def post_now(
     post_id: int,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-    twitter_service = Depends(get_twitter_service)
+    twitter_service=Depends(get_twitter_service)
 ):
     """Post a scheduled tweet immediately"""
     post = db.query(ScheduledPost).filter(

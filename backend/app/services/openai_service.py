@@ -1,5 +1,5 @@
 import openai
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any
 from app.core.config import settings
 from app.core.interfaces import ContentGeneratorInterface
 from app.core.constants import OpenAIConstants, ContentConstants, TwitterConstants
@@ -212,7 +212,10 @@ class OpenAIService(ContentGeneratorInterface):
             }
 
         except Exception as e:
-            raise OpenAIAPIError(f"Reply generation failed: {str(e)}", {"original_tweet": original_tweet, "reply_style": reply_style})
+            raise OpenAIAPIError(
+                f"Reply generation failed: {
+                    str(e)}", {
+                    "original_tweet": original_tweet, "reply_style": reply_style})
 
 
 # Factory function for dependency injection

@@ -4,10 +4,12 @@ from sqlalchemy.orm import relationship
 import enum
 from app.core.database import Base
 
+
 class PostStatus(enum.Enum):
     PENDING = "pending"
     POSTED = "posted"
     FAILED = "failed"
+
 
 class ScheduledPost(Base):
     __tablename__ = "scheduled_posts"
@@ -18,11 +20,11 @@ class ScheduledPost(Base):
     scheduled_time = Column(DateTime(timezone=True), nullable=False)
     status = Column(Enum(PostStatus), default=PostStatus.PENDING)
     tweet_id = Column(String, nullable=True)  # Twitter's tweet ID after posting
-    
+
     # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    
+
     # Relationships
     user = relationship("User", back_populates="scheduled_posts")
 

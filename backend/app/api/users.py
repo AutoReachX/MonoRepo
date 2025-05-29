@@ -9,11 +9,13 @@ from app.api.auth import get_password_hash, get_current_user
 
 router = APIRouter()
 
+
 class UserCreate(BaseModel):
     username: str
     email: EmailStr
     password: str
     full_name: Optional[str] = None
+
 
 class UserResponse(BaseModel):
     model_config = {"from_attributes": True}
@@ -25,9 +27,11 @@ class UserResponse(BaseModel):
     is_active: bool
     twitter_username: Optional[str]
 
+
 class UserUpdate(BaseModel):
     full_name: Optional[str] = None
     twitter_username: Optional[str] = None
+
 
 @router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def create_user(user: UserCreate, db: Session = Depends(get_db)):
@@ -54,9 +58,11 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db.refresh(db_user)
     return db_user
 
+
 @router.get("/me", response_model=UserResponse)
 async def read_user_me(current_user: User = Depends(get_current_user)):
     return current_user
+
 
 @router.put("/me", response_model=UserResponse)
 async def update_user_me(
@@ -70,6 +76,7 @@ async def update_user_me(
     db.commit()
     db.refresh(current_user)
     return current_user
+
 
 @router.get("/{user_id}", response_model=UserResponse)
 async def read_user(user_id: int, db: Session = Depends(get_db)):

@@ -3,7 +3,7 @@ Tests for content API endpoints.
 Testing API layer with mocked services.
 """
 
-import pytest
+import pytest  # noqa: F401
 from fastapi.testclient import TestClient
 from unittest.mock import Mock, AsyncMock
 from app.main import app

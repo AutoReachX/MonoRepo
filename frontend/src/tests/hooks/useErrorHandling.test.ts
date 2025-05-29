@@ -166,12 +166,12 @@ describe('useRetryableOperation', () => {
   it('should retry on retryable error', async () => {
     const mockError = new Error('Retryable error');
     (ErrorHandler.isRetryableError as jest.Mock).mockReturnValue(true);
-    
+
     const mockOperation = jest.fn()
       .mockRejectedValueOnce(mockError)
       .mockResolvedValue('success');
 
-    const { result } = renderHook(() => 
+    const { result } = renderHook(() =>
       useRetryableOperation(mockOperation, { maxRetries: 3, retryDelay: 1000 })
     );
 
@@ -195,17 +195,17 @@ describe('useRetryableOperation', () => {
     const mockError = new Error('Persistent error');
     (ErrorHandler.isRetryableError as jest.Mock).mockReturnValue(true);
     (ErrorHandler.getErrorMessage as jest.Mock).mockReturnValue('Persistent error');
-    
+
     const mockOperation = jest.fn().mockRejectedValue(mockError);
 
-    const { result } = renderHook(() => 
+    const { result } = renderHook(() =>
       useRetryableOperation(mockOperation, { maxRetries: 2, retryDelay: 100 })
     );
 
     await act(async () => {
       try {
         await result.current.execute('test-arg');
-      } catch (error) {
+      } catch {
         // Expected to throw after max retries
       }
     });
@@ -225,7 +225,7 @@ describe('useRetryableOperation', () => {
     const mockError = new Error('Non-retryable error');
     (ErrorHandler.isRetryableError as jest.Mock).mockReturnValue(false);
     (ErrorHandler.getErrorMessage as jest.Mock).mockReturnValue('Non-retryable error');
-    
+
     const mockOperation = jest.fn().mockRejectedValue(mockError);
 
     const { result } = renderHook(() => useRetryableOperation(mockOperation));
@@ -233,7 +233,7 @@ describe('useRetryableOperation', () => {
     await act(async () => {
       try {
         await result.current.execute('test-arg');
-      } catch (error) {
+      } catch {
         // Expected to throw immediately
       }
     });

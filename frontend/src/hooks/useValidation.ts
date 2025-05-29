@@ -5,10 +5,8 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import {
-  ValidationUtils,
   ContentValidation,
   FormValidation,
-  ValidationResult,
   FieldValidationResult,
   ValidationSchemas
 } from '@/lib/validation';
@@ -50,20 +48,27 @@ export function useFormValidation<T extends Record<string, unknown>>(
   });
 
   // Debounced validation function
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedValidate = useCallback(
-    debounce((dataToValidate: T) => {
-      setValidationState(prev => ({ ...prev, isValidating: true }));
-      
-      const errors = FormValidation.validateFormData(dataToValidate, validationSchema);
-      const hasErrors = Object.values(errors).some(error => error !== undefined);
-      
-      setValidationState({
-        errors: errors as Record<string, string>,
-        isValid: !hasErrors,
-        isValidating: false,
-        hasValidated: true
-      });
-    }, debounceDelay),
+    (() => {
+      let timeoutId: NodeJS.Timeout;
+      return (dataToValidate: T) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          setValidationState(prev => ({ ...prev, isValidating: true }));
+
+          const errors = FormValidation.validateFormData(dataToValidate, validationSchema);
+          const hasErrors = Object.values(errors).some(error => error !== undefined);
+
+          setValidationState({
+            errors: errors as Record<string, string>,
+            isValid: !hasErrors,
+            isValidating: false,
+            hasValidated: true
+          });
+        }, debounceDelay);
+      };
+    })(),
     [validationSchema, debounceDelay]
   );
 
@@ -74,7 +79,7 @@ export function useFormValidation<T extends Record<string, unknown>>(
       if (!validator) return;
 
       const result = validator(value);
-      
+
       setValidationState(prev => ({
         ...prev,
         errors: {
@@ -118,7 +123,7 @@ export function useFormValidation<T extends Record<string, unknown>>(
   const validateAll = useCallback(() => {
     const errors = FormValidation.validateFormData(data, validationSchema);
     const hasErrors = Object.values(errors).some(error => error !== undefined);
-    
+
     setValidationState({
       errors: errors as Record<string, string>,
       isValid: !hasErrors,
@@ -211,13 +216,20 @@ export function useFieldValidation(
   const [result, setResult] = useState<FieldValidationResult>({ isValid: true });
   const [isValidating, setIsValidating] = useState(false);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedValidate = useCallback(
-    debounce((value: unknown) => {
-      setIsValidating(true);
-      const validationResult = validator(value);
-      setResult(validationResult);
-      setIsValidating(false);
-    }, debounceDelay),
+    (() => {
+      let timeoutId: NodeJS.Timeout;
+      return (value: unknown) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          setIsValidating(true);
+          const validationResult = validator(value);
+          setResult(validationResult);
+          setIsValidating(false);
+        }, debounceDelay);
+      };
+    })(),
     [validator, debounceDelay]
   );
 
@@ -254,15 +266,4 @@ export function useValidationSchemas() {
   }), []);
 }
 
-// Utility function for debouncing
-function debounce<T extends (...args: any[]) => void>(
-  func: T,
-  delay: number
-): (...args: Parameters<T>) => void {
-  let timeoutId: NodeJS.Timeout;
-  
-  return (...args: Parameters<T>) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func(...args), delay);
-  };
-}
+

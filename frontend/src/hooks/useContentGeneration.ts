@@ -17,15 +17,13 @@ export interface UseContentGenerationState {
 
 export interface ContentGenerationOptions {
   validateBeforeGeneration?: boolean;
-  autoRetry?: boolean;
   onSuccess?: (content: GeneratedContent) => void;
-  onError?: (error: any) => void;
+  onError?: (error: unknown) => void;
 }
 
 export function useContentGeneration(options: ContentGenerationOptions = {}) {
   const {
     validateBeforeGeneration = true,
-    autoRetry = true,
     onSuccess,
     onError
   } = options;
@@ -41,13 +39,11 @@ export function useContentGeneration(options: ContentGenerationOptions = {}) {
     errorState,
     handleContentError,
     handleValidationError,
-    clearError,
-    retry
+    clearError
   } = useContentErrorHandling();
 
   const {
     validateTopic,
-    validateContent,
     getContentStats,
     clearValidation
   } = useContentValidation();
@@ -64,17 +60,14 @@ export function useContentGeneration(options: ContentGenerationOptions = {}) {
       errors.topic = topicResult.error;
     }
 
-    // Validate style if provided
-    if (request.style && !['engaging', 'professional', 'casual', 'educational', 'humorous', 'informative', 'helpful'].includes(request.style)) {
-      errors.style = 'Invalid content style';
+    // Validate tone if provided
+    if (request.tone && !['professional', 'casual', 'humorous', 'inspirational'].includes(request.tone)) {
+      errors.tone = 'Invalid content tone';
     }
 
-    // Validate user context if provided
-    if (request.userContext) {
-      const contextResult = validateContent(request.userContext);
-      if (!contextResult.isValid && contextResult.error) {
-        errors.userContext = contextResult.error;
-      }
+    // Validate length if provided
+    if (request.length && !['short', 'medium', 'long'].includes(request.length)) {
+      errors.length = 'Invalid content length';
     }
 
     const hasErrors = Object.keys(errors).length > 0;
@@ -90,7 +83,7 @@ export function useContentGeneration(options: ContentGenerationOptions = {}) {
     }
 
     return !hasErrors;
-  }, [validateTopic, validateContent, handleValidationError]);
+  }, [validateTopic, handleValidationError]);
 
   // Generate content with validation and error handling
   const generateContent = useCallback(async (request: ContentRequest): Promise<GeneratedContent | undefined> => {
@@ -137,42 +130,43 @@ export function useContentGeneration(options: ContentGenerationOptions = {}) {
   // Generate tweet specifically
   const generateTweet = useCallback(async (
     topic: string,
-    style?: string,
-    userContext?: string
+    tone?: 'professional' | 'casual' | 'humorous' | 'inspirational',
+    length?: 'short' | 'medium' | 'long'
   ): Promise<GeneratedContent | undefined> => {
     return generateContent({
-      type: 'tweet',
       topic,
-      style: style || 'engaging',
-      userContext
+      tone: tone || 'professional',
+      length: length || 'medium',
+      includeHashtags: true,
+      includeEmojis: false
     });
   }, [generateContent]);
 
   // Generate thread specifically
   const generateThread = useCallback(async (
     topic: string,
-    numTweets: number = 3,
-    style?: string
+    tone?: 'professional' | 'casual' | 'humorous' | 'inspirational'
   ): Promise<GeneratedContent | undefined> => {
     return generateContent({
-      type: 'thread',
       topic,
-      numTweets,
-      style: style || 'informative'
+      tone: tone || 'professional',
+      length: 'long',
+      includeHashtags: true,
+      includeEmojis: false
     });
   }, [generateContent]);
 
   // Generate reply specifically
   const generateReply = useCallback(async (
-    originalTweet: string,
-    replyStyle?: string,
-    userContext?: string
+    topic: string,
+    tone?: 'professional' | 'casual' | 'humorous' | 'inspirational'
   ): Promise<GeneratedContent | undefined> => {
     return generateContent({
-      type: 'reply',
-      originalTweet,
-      replyStyle: replyStyle || 'helpful',
-      userContext
+      topic,
+      tone: tone || 'professional',
+      length: 'short',
+      includeHashtags: false,
+      includeEmojis: false
     });
   }, [generateContent]);
 

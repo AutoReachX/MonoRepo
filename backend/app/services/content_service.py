@@ -16,15 +16,15 @@ from app.services.validation_service import ValidationService
 
 class ContentService:
     """Service for handling content generation operations"""
-    
+
     def __init__(
-        self, 
+        self,
         content_generator: ContentGeneratorInterface,
         validation_service: ValidationService
     ):
         self.content_generator = content_generator
         self.validation_service = validation_service
-    
+
     async def generate_tweet(
         self,
         topic: str,
@@ -46,7 +46,7 @@ class ContentService:
             validation_result = self.validation_service.validate_content_generation_request(validation_data)
             if not validation_result["is_valid"]:
                 raise ContentGenerationError("Invalid input data", {"errors": validation_result["errors"]})
-            
+
             # Generate content
             result = await self.content_generator.generate_tweet(
                 topic=topic,
@@ -54,7 +54,7 @@ class ContentService:
                 user_context=user_context,
                 language=language
             )
-            
+
             # Log the generation
             self._log_content_generation(
                 user=user,
@@ -63,14 +63,14 @@ class ContentService:
                 mode=ContentModes.NEW_TWEET,
                 db=db
             )
-            
+
             return result
-            
+
         except Exception as e:
             if isinstance(e, ContentGenerationError):
                 raise
             raise ContentGenerationError(f"Tweet generation failed: {str(e)}")
-    
+
     async def generate_thread(
         self,
         topic: str,
@@ -92,7 +92,7 @@ class ContentService:
             validation_result = self.validation_service.validate_thread_generation_request(validation_data)
             if not validation_result["is_valid"]:
                 raise ContentGenerationError("Invalid input data", {"errors": validation_result["errors"]})
-            
+
             # Generate content
             result = await self.content_generator.generate_thread(
                 topic=topic,
@@ -100,7 +100,7 @@ class ContentService:
                 style=style,
                 language=language
             )
-            
+
             # Log the generation
             self._log_content_generation(
                 user=user,
@@ -109,14 +109,14 @@ class ContentService:
                 mode=ContentModes.THREAD,
                 db=db
             )
-            
+
             return result
-            
+
         except Exception as e:
             if isinstance(e, ContentGenerationError):
                 raise
             raise ContentGenerationError(f"Thread generation failed: {str(e)}")
-    
+
     async def generate_reply(
         self,
         original_tweet: str,
@@ -135,7 +135,7 @@ class ContentService:
                 user_context=user_context,
                 language=language
             )
-            
+
             # Log the generation
             self._log_content_generation(
                 user=user,
@@ -144,14 +144,14 @@ class ContentService:
                 mode=ContentModes.REPLY,
                 db=db
             )
-            
+
             return result
-            
+
         except Exception as e:
             if isinstance(e, ContentGenerationError):
                 raise
             raise ContentGenerationError(f"Reply generation failed: {str(e)}")
-    
+
     def _log_content_generation(
         self,
         user: User,

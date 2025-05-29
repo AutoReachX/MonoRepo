@@ -13,11 +13,11 @@ from app.core.error_handlers import handle_service_errors
 from app.core.types import (
     ContentGenerationRequest,
     ThreadGenerationRequest,
-    ReplyGenerationRequest,
-    ContentGenerationResult
+    ReplyGenerationRequest
 )
 
 router = APIRouter()
+
 
 class ContentGenerationRequestModel(BaseModel):
     """Pydantic model for API request validation"""
@@ -26,6 +26,7 @@ class ContentGenerationRequestModel(BaseModel):
     user_context: Optional[str] = None
     language: Optional[str] = ContentConstants.DEFAULT_LANGUAGE
 
+
 class ThreadGenerationRequestModel(BaseModel):
     """Pydantic model for thread generation API request validation"""
     topic: str
@@ -33,12 +34,14 @@ class ThreadGenerationRequestModel(BaseModel):
     style: Optional[str] = "informative"
     language: Optional[str] = ContentConstants.DEFAULT_LANGUAGE
 
+
 class ReplyGenerationRequestModel(BaseModel):
     """Pydantic model for reply generation API request validation"""
     original_tweet: str
     reply_style: Optional[str] = "helpful"
     user_context: Optional[str] = None
     language: Optional[str] = ContentConstants.DEFAULT_LANGUAGE
+
 
 class ContentResponse(BaseModel):
     """Standardized response model for content generation"""
@@ -48,6 +51,7 @@ class ContentResponse(BaseModel):
     tokens_used: Optional[int]
     metadata: Optional[dict] = None
     error: Optional[str] = None
+
 
 @router.post("/generate-tweet", response_model=ContentResponse)
 @handle_service_errors
@@ -84,6 +88,7 @@ async def generate_tweet(
         error=None
     )
 
+
 @router.post("/generate-thread", response_model=ContentResponse)
 @handle_service_errors
 async def generate_thread(
@@ -118,6 +123,7 @@ async def generate_thread(
         error=None
     )
 
+
 @router.post("/generate-reply", response_model=ContentResponse)
 @handle_service_errors
 async def generate_reply(
@@ -151,6 +157,7 @@ async def generate_reply(
         metadata=result.metadata,
         error=None
     )
+
 
 @router.get("/history")
 @handle_service_errors

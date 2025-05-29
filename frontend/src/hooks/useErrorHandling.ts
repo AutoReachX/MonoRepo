@@ -10,8 +10,7 @@ import {
   AuthErrorHandler,
   NetworkErrorHandler,
   RetryHandler,
-  ApiError,
-  withErrorHandling
+  ApiError
 } from '@/lib/errorHandling';
 import { API_CONFIG } from '@/lib/constants';
 
@@ -91,7 +90,7 @@ export function useErrorHandling(maxRetries: number = API_CONFIG.RETRY_ATTEMPTS)
   }, []);
 
   // Retry failed operation
-  const retry = useCallback(async (operation: () => Promise<any>) => {
+  const retry = useCallback(async (operation: () => Promise<unknown>) => {
     if (!retryState.canRetry || retryState.isRetrying) {
       return;
     }
@@ -214,7 +213,7 @@ export function useNetworkErrorHandling() {
 /**
  * Hook for async operations with built-in error handling
  */
-export function useAsyncOperation<T = any>() {
+export function useAsyncOperation<T = unknown>() {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<T | null>(null);
   const { errorState, handleError, clearError } = useErrorHandling();
@@ -271,7 +270,7 @@ export function useErrorBoundary() {
     setError(null);
   }, []);
 
-  const captureError = useCallback((error: Error, errorInfo?: any) => {
+  const captureError = useCallback((error: Error, errorInfo?: unknown) => {
     setHasError(true);
     setError(error);
 
@@ -297,7 +296,7 @@ export interface ErrorHistoryItem {
   id: string;
   message: string;
   timestamp: number;
-  context?: any;
+  context?: unknown;
 }
 
 export interface UseErrorHandlerOptions {
@@ -310,7 +309,7 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}) {
   const [errorHistory, setErrorHistory] = useState<ErrorHistoryItem[]>([]);
   const errorIdRef = useRef<number>(0);
 
-  const handleError = useCallback((error: unknown, context?: any) => {
+  const handleError = useCallback((error: unknown, context?: unknown) => {
     const message = ErrorHandler.getErrorMessage(error);
     const errorId = `error_${++errorIdRef.current}_${Date.now()}`;
 
@@ -364,7 +363,7 @@ export interface UseRetryableOperationOptions {
   retryDelay?: number;
 }
 
-export function useRetryableOperation<T extends any[], R>(
+export function useRetryableOperation<T extends unknown[], R>(
   operation: (...args: T) => Promise<R>,
   options: UseRetryableOperationOptions = {}
 ) {
@@ -459,6 +458,10 @@ export function useToastNotifications() {
   const [notifications, setNotifications] = useState<ToastNotification[]>([]);
   const notificationIdRef = useRef<number>(0);
 
+  const removeNotification = useCallback((id: string) => {
+    setNotifications(prev => prev.filter(notification => notification.id !== id));
+  }, []);
+
   const addNotification = useCallback((notification: Omit<ToastNotification, 'id'>) => {
     const id = `toast_${++notificationIdRef.current}_${Date.now()}`;
     const newNotification: ToastNotification = {
@@ -474,11 +477,7 @@ export function useToastNotifications() {
         removeNotification(id);
       }, notification.duration);
     }
-  }, []);
-
-  const removeNotification = useCallback((id: string) => {
-    setNotifications(prev => prev.filter(notification => notification.id !== id));
-  }, []);
+  }, [removeNotification]);
 
   const clearAll = useCallback(() => {
     setNotifications([]);

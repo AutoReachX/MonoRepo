@@ -2,6 +2,7 @@ import tweepy
 from typing import Optional, Dict, Any
 from app.core.config import settings
 
+
 class TwitterService:
     def __init__(self,
                  api_key: Optional[str] = None,
@@ -57,7 +58,8 @@ class TwitterService:
                 raise ValueError("Twitter API credentials are required")
             self._initialize_client()
 
-    def post_tweet(self, text: str, user_access_token: str = None, user_access_token_secret: str = None) -> Optional[Dict[str, Any]]:
+    def post_tweet(self, text: str, user_access_token: str = None,
+                   user_access_token_secret: str = None) -> Optional[Dict[str, Any]]:
         """Post a tweet to Twitter"""
         try:
             # If user tokens provided, use them instead of app tokens
@@ -202,6 +204,8 @@ class TwitterService:
             }
 
 # Factory function for dependency injection
+
+
 def create_twitter_service(
     api_key: Optional[str] = None,
     api_secret: Optional[str] = None,

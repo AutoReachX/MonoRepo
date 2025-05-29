@@ -24,6 +24,7 @@ with open('.env', 'r') as f:
 load_dotenv(override=True, verbose=True)
 print("Environment variables loaded.")
 
+
 def test_connection():
     """Test database connection"""
     try:
@@ -45,13 +46,14 @@ def test_connection():
 
         # Test connection
         with engine.connect() as connection:
-            result = connection.execute(text("SELECT 1"))
+            _ = connection.execute(text("SELECT 1"))
             print("✅ Database connection successful!")
             return True
 
     except Exception as e:
         print(f"❌ Database connection failed: {e}")
         return False
+
 
 if __name__ == "__main__":
     success = test_connection()

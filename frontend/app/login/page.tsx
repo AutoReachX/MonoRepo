@@ -46,10 +46,6 @@ export default function LoginPage() {
     }));
   };
 
-  const handleTwitterSuccess = () => {
-    router.push('/dashboard');
-  };
-
   const handleTwitterError = (error: string) => {
     setError(error);
   };
@@ -80,7 +76,6 @@ export default function LoginPage() {
               Recommended Sign In Method
             </h3>
             <TwitterOAuth2Login
-              onSuccess={handleTwitterSuccess}
               onError={handleTwitterError}
             />
           </div>

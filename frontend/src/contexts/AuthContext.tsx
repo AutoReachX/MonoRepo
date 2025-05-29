@@ -87,8 +87,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const login = async (credentials: { username: string; password: string }) => {
     try {
-      const response = await authService.login(credentials);
-      setUser(response.user);
+      await authService.login(credentials);
+      // After successful login, fetch user data
+      await refreshUser();
     } catch (error) {
       throw error;
     }
@@ -104,10 +105,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const initAuth = async () => {
       setIsLoading(true);
-      
+
       try {
         const token = authService.getToken();
-        
+
         if (token) {
           // Try to get current user
           await refreshUser();

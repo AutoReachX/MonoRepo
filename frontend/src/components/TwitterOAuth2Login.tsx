@@ -2,18 +2,15 @@
 
 import React, { useState } from 'react';
 import { authService } from '@/lib/authService';
-import { STORAGE_KEYS } from '@/lib/constants';
 
 interface TwitterOAuth2LoginProps {
-  onSuccess?: (user: any) => void;
   onError?: (error: string) => void;
   className?: string;
 }
 
-export default function TwitterOAuth2Login({ 
-  onSuccess, 
-  onError, 
-  className = '' 
+export default function TwitterOAuth2Login({
+  onError,
+  className = ''
 }: TwitterOAuth2LoginProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,15 +22,17 @@ export default function TwitterOAuth2Login({
     try {
       // Initialize Twitter OAuth 2.0 flow
       const authData = await authService.initiateTwitterOAuth2();
-      
+
       // Store OAuth state and code verifier for callback
       sessionStorage.setItem('twitter_oauth2_state', authData.state);
       sessionStorage.setItem('twitter_oauth2_code_verifier', authData.code_verifier);
-      
+
       // Redirect to Twitter authorization
       window.location.href = authData.authorization_url;
-    } catch (error: any) {
-      const errorMessage = `Failed to start Twitter login: ${error.message}`;
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error
+        ? `Failed to start Twitter login: ${error.message}`
+        : 'Failed to start Twitter login: Unknown error occurred';
       setError(errorMessage);
       onError?.(errorMessage);
       setIsLoading(false);
@@ -52,8 +51,8 @@ export default function TwitterOAuth2Login({
         onClick={handleTwitterLogin}
         disabled={isLoading}
         className={`
-          w-full flex items-center justify-center px-4 py-3 border border-transparent 
-          text-base font-medium rounded-md text-white bg-blue-500 hover:bg-blue-600 
+          w-full flex items-center justify-center px-4 py-3 border border-transparent
+          text-base font-medium rounded-md text-white bg-blue-500 hover:bg-blue-600
           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
           disabled:opacity-50 disabled:cursor-not-allowed
           transition-colors duration-200

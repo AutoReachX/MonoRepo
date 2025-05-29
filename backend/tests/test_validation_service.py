@@ -3,9 +3,9 @@ Tests for validation service.
 Following good testing practices with clear test cases.
 """
 
-import pytest
+import pytest  # noqa: F401
 from app.services.validation_service import ValidationService
-from app.core.constants import ValidationRules, TwitterConstants, ContentConstants
+from app.core.constants import TwitterConstants  # ValidationRules, ContentConstants unused
 
 
 class TestValidationService:

@@ -4,14 +4,13 @@ Refactored to use common validation utilities and eliminate code duplication.
 """
 
 import re
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 from app.core.interfaces import ValidationInterface
 from app.core.validation_utils import (
     TwitterContentValidator,
     validate_content_generation_request,
     validate_thread_generation_request
 )
-from app.core.exceptions import ValidationError
 
 
 class ValidationService(ValidationInterface):
@@ -124,6 +123,7 @@ class ValidationService(ValidationInterface):
             errors.append(f"{field_name} must be one of: {', '.join(map(str, choices))}")
 
         return errors
+
 
 # Global instance for dependency injection
 validation_service = ValidationService()

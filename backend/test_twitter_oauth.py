@@ -6,6 +6,8 @@ This script tests the Twitter OAuth setup without requiring a full app run.
 Run this to verify your Twitter API credentials are working.
 """
 
+from app.core.config import settings
+from app.services.twitter_service import TwitterService
 import os
 import sys
 from dotenv import load_dotenv
@@ -16,8 +18,6 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 # Load environment variables
 load_dotenv()
 
-from app.services.twitter_service import TwitterService
-from app.core.config import settings
 
 def test_twitter_credentials():
     """Test Twitter API credentials"""
@@ -85,6 +85,7 @@ def test_twitter_credentials():
         print(f"  ❌ TwitterService initialization failed: {str(e)}")
         return False
 
+
 def test_twitter_api_connection():
     """Test basic Twitter API connection"""
     print("\n🌐 Testing Twitter API connection...")
@@ -112,6 +113,7 @@ def test_twitter_api_connection():
     except Exception as e:
         print(f"  ❌ Twitter API connection failed: {str(e)}")
         return False
+
 
 def main():
     """Main test function"""
@@ -147,6 +149,7 @@ def main():
         print("Refer to TWITTER_OAUTH_SETUP.md for detailed instructions.")
 
     return oauth_test and api_test
+
 
 if __name__ == "__main__":
     success = main()

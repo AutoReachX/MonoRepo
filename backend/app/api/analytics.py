@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import func
 from pydantic import BaseModel
 from typing import List, Dict, Any
 from datetime import datetime, timedelta
@@ -12,6 +11,7 @@ from app.api.auth import get_current_user
 
 router = APIRouter()
 
+
 class AnalyticsResponse(BaseModel):
     total_tweets: int
     total_likes: int
@@ -21,6 +21,7 @@ class AnalyticsResponse(BaseModel):
     follower_growth: Dict[str, Any]
     top_tweets: List[Dict[str, Any]]
 
+
 @router.get("/dashboard", response_model=AnalyticsResponse)
 async def get_dashboard_analytics(
     current_user: User = Depends(get_current_user),
@@ -28,17 +29,17 @@ async def get_dashboard_analytics(
 ):
     # Get user's tweets
     tweets = db.query(Tweet).filter(Tweet.user_id == current_user.id).all()
-    
+
     # Calculate basic metrics
     total_tweets = len(tweets)
     total_likes = sum(tweet.likes_count for tweet in tweets)
     total_retweets = sum(tweet.retweets_count for tweet in tweets)
     total_replies = sum(tweet.replies_count for tweet in tweets)
-    
+
     # Calculate engagement rate
     total_engagement = total_likes + total_retweets + total_replies
     avg_engagement_rate = (total_engagement / total_tweets) if total_tweets > 0 else 0
-    
+
     # Get top performing tweets
     top_tweets = []
     sorted_tweets = sorted(tweets, key=lambda t: t.likes_count + t.retweets_count, reverse=True)[:5]
@@ -50,7 +51,7 @@ async def get_dashboard_analytics(
             "retweets": tweet.retweets_count,
             "engagement": tweet.likes_count + tweet.retweets_count + tweet.replies_count
         })
-    
+
     # Mock follower growth data (would be real data from Twitter API)
     follower_growth = {
         "current_followers": 12543,
@@ -58,7 +59,7 @@ async def get_dashboard_analytics(
         "monthly_growth": 18.7,
         "growth_trend": "increasing"
     }
-    
+
     return AnalyticsResponse(
         total_tweets=total_tweets,
         total_likes=total_likes,
@@ -68,6 +69,7 @@ async def get_dashboard_analytics(
         follower_growth=follower_growth,
         top_tweets=top_tweets
     )
+
 
 @router.get("/engagement")
 async def get_engagement_analytics(
@@ -81,7 +83,7 @@ async def get_engagement_analytics(
         Tweet.user_id == current_user.id,
         Tweet.created_at >= start_date
     ).all()
-    
+
     # Group by day and calculate engagement
     daily_engagement = {}
     for tweet in tweets:
@@ -94,13 +96,14 @@ async def get_engagement_analytics(
                 "retweets": 0,
                 "replies": 0
             }
-        
+
         daily_engagement[day]["tweets"] += 1
         daily_engagement[day]["likes"] += tweet.likes_count
         daily_engagement[day]["retweets"] += tweet.retweets_count
         daily_engagement[day]["replies"] += tweet.replies_count
-    
+
     return {"daily_engagement": list(daily_engagement.values())}
+
 
 @router.get("/growth")
 async def get_growth_analytics(

@@ -10,7 +10,7 @@ import {
   useFieldValidation,
   useValidationSchemas
 } from '@/hooks/useValidation';
-import { ValidationUtils, ContentValidation } from '@/lib/validation';
+import { ContentValidation } from '@/lib/validation';
 
 // Mock the validation utilities
 jest.mock('@/lib/validation', () => ({
@@ -97,8 +97,8 @@ describe('useFormValidation', () => {
 
   it('should debounce validation when delay is set', () => {
     mockValidationSchema.topic.mockReturnValue({ isValid: true });
-    const mockFormValidation = require('@/lib/validation').FormValidation;
-    mockFormValidation.validateFormData.mockReturnValue({});
+    const { FormValidation } = jest.requireMock('@/lib/validation');
+    FormValidation.validateFormData.mockReturnValue({});
 
     const { result } = renderHook(() =>
       useFormValidation(initialData, mockValidationSchema, {
@@ -112,14 +112,14 @@ describe('useFormValidation', () => {
     });
 
     // Validation should not be called immediately
-    expect(mockFormValidation.validateFormData).not.toHaveBeenCalled();
+    expect(FormValidation.validateFormData).not.toHaveBeenCalled();
 
     // Fast-forward time
     act(() => {
       jest.advanceTimersByTime(500);
     });
 
-    expect(mockFormValidation.validateFormData).toHaveBeenCalled();
+    expect(FormValidation.validateFormData).toHaveBeenCalled();
   });
 
   it('should validate field on blur when enabled', () => {
@@ -139,8 +139,8 @@ describe('useFormValidation', () => {
   });
 
   it('should validate all fields', () => {
-    const mockFormValidation = require('@/lib/validation').FormValidation;
-    mockFormValidation.validateFormData.mockReturnValue({
+    const { FormValidation } = jest.requireMock('@/lib/validation');
+    FormValidation.validateFormData.mockReturnValue({
       topic: 'Topic is required'
     });
 

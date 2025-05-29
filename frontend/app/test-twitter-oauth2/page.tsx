@@ -33,10 +33,6 @@ export default function TestTwitterOAuth2Page() {
     }
   };
 
-  const handleTwitterSuccess = (user: TwitterOAuth2CallbackResponse['user']) => {
-    setResult({ success: true, user });
-  };
-
   const handleTwitterError = (error: string) => {
     setError(error);
   };
@@ -92,11 +88,10 @@ export default function TestTwitterOAuth2Page() {
             </h2>
 
             <TwitterOAuth2Login
-              onSuccess={handleTwitterSuccess}
               onError={handleTwitterError}
             />
 
-            {result?.success && (
+            {result && 'success' in result && result.success && (
               <div className="mt-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md">
                 <h3 className="font-medium mb-2">Login Success:</h3>
                 <pre className="text-xs overflow-auto bg-white p-2 rounded border">

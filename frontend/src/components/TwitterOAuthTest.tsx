@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { twitterAuthService } from '@/lib/twitterAuthService';
+import React, { useState, useEffect, useCallback } from 'react';
+import { twitterAuthService, TwitterStatus } from '@/lib/twitterAuthService';
 import { authService } from '@/lib/authService';
 
 interface TwitterOAuthTestProps {
@@ -10,37 +10,34 @@ interface TwitterOAuthTestProps {
 
 export default function TwitterOAuthTest({ className = '' }: TwitterOAuthTestProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [twitterStatus, setTwitterStatus] = useState<{
-    connected: boolean;
-    twitter_username?: string;
-    twitter_user_id?: string;
-  }>({ connected: false });
+  const [twitterStatus, setTwitterStatus] = useState<TwitterStatus>({ connected: false });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
-
-  const checkAuthStatus = async () => {
-    const authenticated = authService.isAuthenticated();
-    setIsAuthenticated(authenticated);
-    
-    if (authenticated) {
-      await loadTwitterStatus();
-    }
-  };
-
-  const loadTwitterStatus = async () => {
+  const loadTwitterStatus = useCallback(async () => {
     try {
       setError(null);
       const status = await twitterAuthService.getTwitterStatus();
       setTwitterStatus(status);
-    } catch (error: any) {
-      setError(`Failed to load Twitter status: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setError(`Failed to load Twitter status: ${errorMessage}`);
     }
-  };
+  }, []);
+
+  const checkAuthStatus = useCallback(async () => {
+    const authenticated = authService.isAuthenticated();
+    setIsAuthenticated(authenticated);
+
+    if (authenticated) {
+      await loadTwitterStatus();
+    }
+  }, [loadTwitterStatus]);
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, [checkAuthStatus]);
 
   const handleConnectTwitter = async () => {
     if (!isAuthenticated) {
@@ -54,20 +51,21 @@ export default function TwitterOAuthTest({ className = '' }: TwitterOAuthTestPro
 
     try {
       const authData = await twitterAuthService.initiateTwitterAuth();
-      
+
       // Store oauth_token_secret for the callback
       sessionStorage.setItem('twitter_oauth_token_secret', authData.oauth_token_secret);
       sessionStorage.setItem('twitter_oauth_token', authData.oauth_token);
-      
+
       setSuccess('Redirecting to Twitter for authorization...');
-      
+
       // Redirect to Twitter authorization
       setTimeout(() => {
         window.location.href = authData.authorization_url;
       }, 1000);
-      
-    } catch (error: any) {
-      setError(`Failed to connect Twitter: ${error.message}`);
+
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setError(`Failed to connect Twitter: ${errorMessage}`);
       setIsLoading(false);
     }
   };
@@ -81,8 +79,9 @@ export default function TwitterOAuthTest({ className = '' }: TwitterOAuthTestPro
       await twitterAuthService.disconnectTwitter();
       setSuccess('Twitter account disconnected successfully');
       await loadTwitterStatus();
-    } catch (error: any) {
-      setError(`Failed to disconnect Twitter: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setError(`Failed to disconnect Twitter: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -96,8 +95,9 @@ export default function TwitterOAuthTest({ className = '' }: TwitterOAuthTestPro
     try {
       await loadTwitterStatus();
       setSuccess('Twitter status refreshed successfully');
-    } catch (error: any) {
-      setError(`Failed to test connection: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setError(`Failed to test connection: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -197,11 +197,11 @@ export default function TwitterOAuthTest({ className = '' }: TwitterOAuthTestPro
       <div className="mt-6 p-3 bg-blue-50 rounded-md">
         <h4 className="font-semibold text-blue-800 mb-2">Test Instructions:</h4>
         <ol className="text-sm text-blue-700 space-y-1">
-          <li>1. Make sure you're logged in to AutoReach</li>
-          <li>2. Click "Connect Twitter Account"</li>
-          <li>3. You'll be redirected to Twitter for authorization</li>
-          <li>4. After authorization, you'll be redirected back</li>
-          <li>5. Check that the status shows "Connected to Twitter"</li>
+          <li>1. Make sure you&apos;re logged in to AutoReach</li>
+          <li>2. Click &quot;Connect Twitter Account&quot;</li>
+          <li>3. You&apos;ll be redirected to Twitter for authorization</li>
+          <li>4. After authorization, you&apos;ll be redirected back</li>
+          <li>5. Check that the status shows &quot;Connected to Twitter&quot;</li>
         </ol>
       </div>
     </div>

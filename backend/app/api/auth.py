@@ -1,12 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
-from typing import Optional
 import secrets
 import hashlib
 import base64
@@ -26,11 +24,14 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/token")
 
+
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
+
 def get_password_hash(password):
     return pwd_context.hash(password)
+
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
@@ -42,8 +43,10 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
+
 def get_user(db: Session, username: str):
     return db.query(User).filter(User.username == username).first()
+
 
 def authenticate_user(db: Session, username: str, password: str):
     user = get_user(db, username)
@@ -52,6 +55,7 @@ def authenticate_user(db: Session, username: str, password: str):
     if not verify_password(password, user.hashed_password):
         return False
     return user
+
 
 async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
@@ -71,6 +75,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
         raise credentials_exception
     return user
 
+
 @router.post("/token")
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = authenticate_user(db, form_data.username, form_data.password)
@@ -85,6 +90,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
 
 @router.get("/me")
 async def read_users_me(current_user: User = Depends(get_current_user)):
@@ -102,10 +108,13 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
     }
 
 # Twitter OAuth Models
+
+
 class TwitterAuthResponse(BaseModel):
     authorization_url: str
     oauth_token: str
     oauth_token_secret: str
+
 
 class TwitterCallbackRequest(BaseModel):
     oauth_token: str
@@ -113,18 +122,23 @@ class TwitterCallbackRequest(BaseModel):
     oauth_token_secret: str  # Add this field
 
 # Twitter OAuth 2.0 Models for User Authentication
+
+
 class TwitterOAuth2InitRequest(BaseModel):
     redirect_uri: str = "http://localhost:3000/auth/twitter/callback"
+
 
 class TwitterOAuth2InitResponse(BaseModel):
     authorization_url: str
     state: str
     code_verifier: str
 
+
 class TwitterOAuth2CallbackRequest(BaseModel):
     code: str
     state: str
     code_verifier: str
+
 
 class TwitterOAuth2CallbackResponse(BaseModel):
     access_token: str
@@ -132,9 +146,12 @@ class TwitterOAuth2CallbackResponse(BaseModel):
     user: dict
 
 # Helper functions for OAuth 2.0 PKCE
+
+
 def generate_code_verifier() -> str:
     """Generate a code verifier for PKCE"""
     return base64.urlsafe_b64encode(secrets.token_bytes(32)).decode('utf-8').rstrip('=')
+
 
 def generate_code_challenge(code_verifier: str) -> str:
     """Generate a code challenge from code verifier"""
@@ -142,6 +159,8 @@ def generate_code_challenge(code_verifier: str) -> str:
     return base64.urlsafe_b64encode(digest).decode('utf-8').rstrip('=')
 
 # Twitter OAuth Endpoints
+
+
 @router.get("/twitter/login")
 async def twitter_login(current_user: User = Depends(get_current_user)):
     """Initiate Twitter OAuth flow"""
@@ -166,6 +185,7 @@ async def twitter_login(current_user: User = Depends(get_current_user)):
         oauth_token=result["oauth_token"],
         oauth_token_secret=result["oauth_token_secret"]
     )
+
 
 @router.post("/twitter/callback")
 async def twitter_callback(
@@ -220,6 +240,7 @@ async def twitter_callback(
         "twitter_user_id": current_user.twitter_user_id
     }
 
+
 @router.get("/twitter/status")
 async def get_twitter_status(current_user: User = Depends(get_current_user)):
     """Get Twitter connection status"""
@@ -228,6 +249,7 @@ async def get_twitter_status(current_user: User = Depends(get_current_user)):
         "twitter_username": current_user.twitter_username,
         "twitter_user_id": current_user.twitter_user_id
     }
+
 
 @router.delete("/twitter/disconnect")
 async def disconnect_twitter(
@@ -244,6 +266,8 @@ async def disconnect_twitter(
     return {"message": "Twitter account disconnected successfully"}
 
 # Twitter OAuth 2.0 User Authentication Endpoints
+
+
 @router.get("/oauth2/twitter/debug")
 async def twitter_oauth2_debug():
     """Debug endpoint to check Twitter OAuth 2.0 configuration"""
@@ -254,6 +278,7 @@ async def twitter_oauth2_debug():
         "redirect_uri": settings.TWITTER_OAUTH_REDIRECT_URI,
         "frontend_url": settings.FRONTEND_URL
     }
+
 
 @router.post("/oauth2/twitter/init")
 async def twitter_oauth2_init(request: TwitterOAuth2InitRequest):
@@ -302,6 +327,7 @@ async def twitter_oauth2_init(request: TwitterOAuth2InitRequest):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to initialize Twitter OAuth 2.0: {str(e)}"
         )
+
 
 @router.post("/oauth2/twitter/callback")
 async def twitter_oauth2_callback(

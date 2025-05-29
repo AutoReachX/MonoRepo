@@ -9,8 +9,8 @@ from fastapi import HTTPException, status
 import logging
 
 from app.core.exceptions import (
-    ValidationError, 
-    ContentGenerationError, 
+    ValidationError,
+    ContentGenerationError,
     DatabaseError,
     OpenAIAPIError
 )
@@ -95,7 +95,7 @@ class ErrorResponseBuilder:
     Builder class for creating consistent error responses.
     Follows Builder pattern and Single Responsibility Principle.
     """
-    
+
     @staticmethod
     def validation_error(message: str, details: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Create a validation error response"""
@@ -107,7 +107,7 @@ class ErrorResponseBuilder:
         if details:
             response["details"] = details
         return response
-    
+
     @staticmethod
     def not_found_error(resource: str) -> Dict[str, Any]:
         """Create a not found error response"""
@@ -116,7 +116,7 @@ class ErrorResponseBuilder:
             "message": f"{resource} not found",
             "status_code": 404
         }
-    
+
     @staticmethod
     def unauthorized_error() -> Dict[str, Any]:
         """Create an unauthorized error response"""
@@ -125,7 +125,7 @@ class ErrorResponseBuilder:
             "message": ErrorMessages.INVALID_CREDENTIALS,
             "status_code": 401
         }
-    
+
     @staticmethod
     def forbidden_error() -> Dict[str, Any]:
         """Create a forbidden error response"""
@@ -134,7 +134,7 @@ class ErrorResponseBuilder:
             "message": ErrorMessages.INSUFFICIENT_PERMISSIONS,
             "status_code": 403
         }
-    
+
     @staticmethod
     def rate_limit_error() -> Dict[str, Any]:
         """Create a rate limit error response"""
@@ -143,7 +143,7 @@ class ErrorResponseBuilder:
             "message": ErrorMessages.RATE_LIMIT_EXCEEDED,
             "status_code": 429
         }
-    
+
     @staticmethod
     def internal_error() -> Dict[str, Any]:
         """Create an internal server error response"""
@@ -159,25 +159,25 @@ class ServiceErrorHandler:
     Centralized error handling for service layer.
     Follows Single Responsibility Principle.
     """
-    
+
     def __init__(self, logger_name: str):
         self.logger = logging.getLogger(logger_name)
-    
+
     def handle_validation_error(self, error: ValidationError, context: str = "") -> None:
         """Handle validation errors with proper logging"""
         self.logger.warning(f"Validation error{' in ' + context if context else ''}: {str(error)}")
         raise error
-    
+
     def handle_generation_error(self, error: Exception, context: str = "") -> None:
         """Handle content generation errors"""
         self.logger.error(f"Generation error{' in ' + context if context else ''}: {str(error)}")
         raise ContentGenerationError(f"Content generation failed: {str(error)}")
-    
+
     def handle_database_error(self, error: Exception, context: str = "") -> None:
         """Handle database errors"""
         self.logger.error(f"Database error{' in ' + context if context else ''}: {str(error)}")
         raise DatabaseError(f"Database operation failed: {str(error)}")
-    
+
     def handle_external_api_error(self, error: Exception, service: str, context: str = "") -> None:
         """Handle external API errors"""
         self.logger.error(f"{service} API error{' in ' + context if context else ''}: {str(error)}")
@@ -194,14 +194,14 @@ def log_and_raise_http_exception(
     Utility function to log and raise HTTP exceptions consistently.
     """
     log_message = f"HTTP {status_code}{' in ' + context if context else ''}: {detail}"
-    
+
     if status_code >= 500:
         logger.error(log_message)
     elif status_code >= 400:
         logger.warning(log_message)
     else:
         logger.info(log_message)
-    
+
     raise HTTPException(status_code=status_code, detail=detail)
 
 

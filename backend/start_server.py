@@ -15,10 +15,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     print("Starting AutoReach API server...")
     print(f"Working directory: {os.getcwd()}")
-    
+
     # Start the server
     uvicorn.run(
         "app.main:app",
