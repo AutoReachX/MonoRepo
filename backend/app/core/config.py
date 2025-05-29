@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv(override=True)
 
-
 class Settings(BaseSettings):
     # App settings
     APP_NAME: str = "AutoReach"
@@ -14,30 +13,41 @@ class Settings(BaseSettings):
     VERSION: str = "1.0.0"
 
     # Security
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "your-secret-key-here")
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
+    def model_post_init(self, __context):  # noqa: ARG002
+        if not self.SECRET_KEY:
+            raise ValueError("SECRET_KEY environment variable is required for security")
 
     # Database
     DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://user:password@localhost/autoreach")
 
-    # CORS - Updated for production deployment
+    # CORS - Secure configuration
     ALLOWED_HOSTS: List[str] = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:3001",
-        "http://127.0.0.1:3001",
-        os.getenv("FRONTEND_URL", ""),
-        "https://*.onrender.com"
+        "http://127.0.0.1:3001"
     ]
+
+    @property
+    def get_allowed_hosts(self) -> List[str]:
+        """Get CORS allowed hosts with security validation"""
+        hosts = list(self.ALLOWED_HOSTS)
+
+        # Add frontend URL if specified and valid
+        if self.FRONTEND_URL and self.FRONTEND_URL not in hosts:
+            hosts.append(self.FRONTEND_URL)
+
+        return hosts
 
     # Twitter API (OAuth 2.0)
     TWITTER_CLIENT_ID: str = os.getenv("TWITTER_CLIENT_ID", "")
     TWITTER_CLIENT_SECRET: str = os.getenv("TWITTER_CLIENT_SECRET", "")
     TWITTER_BEARER_TOKEN: str = os.getenv("TWITTER_BEARER_TOKEN", "")
-    TWITTER_OAUTH_REDIRECT_URI: str = os.getenv(
-        "TWITTER_OAUTH_REDIRECT_URI",
-        "http://localhost:3000/auth/twitter/oauth2-callback")
+    TWITTER_OAUTH_REDIRECT_URI: str = os.getenv("TWITTER_OAUTH_REDIRECT_URI", "http://localhost:3000/auth/twitter/oauth2-callback")
 
     # Twitter API v1.1 (for tweepy compatibility)
     TWITTER_API_KEY: str = os.getenv("TWITTER_API_KEY", "")
@@ -63,6 +73,5 @@ class Settings(BaseSettings):
     class Config:
         env_file = [".env"]  # Look for .env in current directory
         env_file_encoding = 'utf-8'
-
 
 settings = Settings()

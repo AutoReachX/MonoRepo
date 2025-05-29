@@ -1,5 +1,9 @@
 # Render Blueprint for AutoReach Platform
 # This file defines all services needed for the AutoReach deployment
+#
+# SECURITY WARNING: This is a template file.
+# Update all placeholder values before deploying to production.
+# Never deploy directly from public repositories.
 
 databases:
   - name: autoreach-db
@@ -39,8 +43,8 @@ services:
           type: web
           name: autoreach-frontend
           property: host
-    
-  # Frontend Service  
+
+  # Frontend Service
   - type: web
     name: autoreach-frontend
     runtime: node

@@ -6,6 +6,14 @@ from the front end: npm start
 
 A comprehensive platform for Twitter growth and engagement automation.
 
+## 🔒 Security Notice
+
+**⚠️ IMPORTANT**: This is a public repository. Before deploying:
+1. **Fork this repository** to your private account
+2. **Never commit** API keys, secrets, or credentials
+3. **Review** the [Security Guide](./SECURITY.md) before deployment
+4. **Use environment variables** for all sensitive configuration
+
 ## 🚀 Features
 
 - **Smart Automation**: Intelligent tweet scheduling and engagement
@@ -33,11 +41,15 @@ AutoReach/
 └── .github/                 # GitHub Actions workflows
 ```
 
-## 🚀 Quick Deploy to Render
+## 🚀 Deploy to Render
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/your-username/autoreach)
+**For your own deployment**, fork this repository first, then use the Render Blueprint:
 
-**One-click deployment** using our Render Blueprint configuration.
+1. **Fork this repository** to your GitHub account
+2. **Update the render.yaml** with your specific configuration
+3. **Deploy from your fork** using Render's dashboard
+
+> ⚠️ **Security Note**: Never deploy directly from public repositories as it may expose your configuration.
 
 ## 🛠️ Development Setup
 
