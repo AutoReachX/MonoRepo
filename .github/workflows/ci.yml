@@ -34,9 +34,15 @@ jobs:
 
     - name: Run tests
       env:
-        DATABASE_URL: postgresql://test:test@localhost:5432/test
+        TESTING: true
+        DATABASE_URL: sqlite:///./test.db
         SECRET_KEY: test-secret-key
-        REDIS_URL: redis://localhost:6379
+        OPENAI_API_KEY: ""
+        TWITTER_API_KEY: ""
+        TWITTER_API_SECRET: ""
+        TWITTER_ACCESS_TOKEN: ""
+        TWITTER_ACCESS_TOKEN_SECRET: ""
+        TWITTER_BEARER_TOKEN: ""
         DEBUG: true
       run: |
         cd backend
@@ -67,9 +73,11 @@ jobs:
         npm install
 
     - name: Run tests
+      env:
+        NEXT_PUBLIC_API_URL: http://localhost:8000/api
       run: |
         cd frontend
-        npm test -- --coverage --watchAll=false
+        npm run test:coverage -- --watchAll=false
 
     - name: Build
       run: |

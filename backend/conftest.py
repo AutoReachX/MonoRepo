@@ -89,6 +89,28 @@ def mock_openai_client():
 
 
 @pytest.fixture
+def mock_openai_service():
+    """Mock OpenAI service for testing"""
+    mock_service = Mock()
+    mock_service.generate_tweet.return_value = {
+        "content": "Test generated tweet content",
+        "prompt": "Test prompt",
+        "tokens_used": 50
+    }
+    mock_service.generate_thread.return_value = {
+        "content": ["Tweet 1", "Tweet 2", "Tweet 3"],
+        "prompt": "Test thread prompt",
+        "tokens_used": 150
+    }
+    mock_service.generate_reply.return_value = {
+        "content": "Test generated reply content",
+        "prompt": "Test reply prompt",
+        "tokens_used": 75
+    }
+    return mock_service
+
+
+@pytest.fixture
 def mock_twitter_client():
     """Mock Twitter client for testing"""
     mock_client = Mock()

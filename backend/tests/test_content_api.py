@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from unittest.mock import Mock, AsyncMock
 from app.main import app
 from app.core.database import get_db
-from app.core.dependencies import get_content_service
+from app.core.dependencies import get_content_orchestration_service
 from app.api.auth import get_current_user
 
 
@@ -25,13 +25,13 @@ class TestContentAPI:
         # Mock database
         self.mock_db = Mock()
 
-        # Mock content service
+        # Mock content orchestration service
         self.mock_content_service = Mock()
 
         # Set up dependency overrides
         app.dependency_overrides[get_db] = lambda: self.mock_db
         app.dependency_overrides[get_current_user] = lambda: self.mock_user
-        app.dependency_overrides[get_content_service] = lambda: self.mock_content_service
+        app.dependency_overrides[get_content_orchestration_service] = lambda: self.mock_content_service
 
     def teardown_method(self):
         """Clean up after each test"""
@@ -40,7 +40,7 @@ class TestContentAPI:
     def test_generate_tweet_success(self):
         """Test successful tweet generation endpoint"""
         # Arrange
-        self.mock_content_service.generate_tweet = AsyncMock(return_value={
+        self.mock_content_service.generate_and_log_tweet = AsyncMock(return_value={
             "content": "Generated tweet content",
             "prompt": "Test prompt",
             "tokens_used": 50
@@ -69,7 +69,7 @@ class TestContentAPI:
     def test_generate_tweet_validation_error(self):
         """Test tweet generation with validation error"""
         # Arrange
-        self.mock_content_service.generate_tweet = AsyncMock(
+        self.mock_content_service.generate_and_log_tweet = AsyncMock(
             side_effect=Exception("Validation error")
         )
 
@@ -88,8 +88,7 @@ class TestContentAPI:
     def test_generate_thread_success(self):
         """Test successful thread generation endpoint"""
         # Arrange
-        self.mock_content_service.generate_thread = AsyncMock(return_value={
-            "success": True,
+        self.mock_content_service.generate_and_log_thread = AsyncMock(return_value={
             "content": "Generated thread content",
             "prompt": "Thread prompt",
             "tokens_used": 150
@@ -114,8 +113,7 @@ class TestContentAPI:
     def test_generate_reply_success(self):
         """Test successful reply generation endpoint"""
         # Arrange
-        self.mock_content_service.generate_reply = AsyncMock(return_value={
-            "success": True,
+        self.mock_content_service.generate_and_log_reply = AsyncMock(return_value={
             "content": "Generated reply content",
             "prompt": "Reply prompt",
             "tokens_used": 75
@@ -168,14 +166,18 @@ class TestContentAPI:
     def test_get_content_history_success(self):
         """Test successful content history retrieval"""
         # Arrange
-        mock_query = Mock()
-        self.mock_db.query.return_value = mock_query
-        mock_query.filter.return_value = mock_query
-        mock_query.order_by.return_value = mock_query
-        mock_query.offset.return_value = mock_query
-        mock_query.limit.return_value = mock_query
-        mock_query.all.return_value = []
-        mock_query.count.return_value = 0
+        self.mock_content_service.get_user_content_history = Mock(return_value={
+            "history": [],
+            "statistics": {
+                "total_generated": 0,
+                "by_mode": {}
+            },
+            "pagination": {
+                "limit": 50,
+                "offset": 0,
+                "has_more": False
+            }
+        })
 
         # Act
         response = self.client.get("/api/content/history")
@@ -184,4 +186,5 @@ class TestContentAPI:
         assert response.status_code == 200
         data = response.json()
         assert "history" in data
-        assert "total" in data
+        assert "statistics" in data
+        assert "pagination" in data
