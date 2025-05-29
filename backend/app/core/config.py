@@ -20,12 +20,14 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://user:password@localhost/autoreach")
 
-    # CORS
+    # CORS - Updated for production deployment
     ALLOWED_HOSTS: List[str] = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:3001",
-        "http://127.0.0.1:3001"
+        "http://127.0.0.1:3001",
+        os.getenv("FRONTEND_URL", ""),
+        "https://*.onrender.com"
     ]
 
     # Twitter API (OAuth 2.0)

@@ -1,6 +1,6 @@
 # AutoReach - Twitter Growth Platform
 
-# Start independent parts 
+# Start independent parts
 from the back end: python start_server.py
 from the front end: npm start
 
@@ -32,6 +32,12 @@ AutoReach/
 ├── docs/                    # Documentation
 └── .github/                 # GitHub Actions workflows
 ```
+
+## 🚀 Quick Deploy to Render
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/your-username/autoreach)
+
+**One-click deployment** using our Render Blueprint configuration.
 
 ## 🛠️ Development Setup
 
