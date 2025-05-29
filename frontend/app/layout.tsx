@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AutoReach",
+  title: "Reachly",
   description: "Automate your Twitter growth with AI-powered content creation and engagement",
   icons: {
     icon: '/favicon.svg',

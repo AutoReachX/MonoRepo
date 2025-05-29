@@ -160,7 +160,7 @@ function TwitterCallbackContent() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
                 <span className="text-sm text-green-800">
-                  You can now create and schedule tweets from AutoReach!
+                  You can now create and schedule tweets from Reachly!
                 </span>
               </div>
             </div>
