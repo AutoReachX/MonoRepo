@@ -27,7 +27,9 @@ dist/
 downloads/
 eggs/
 .eggs/
+# Exclude Python lib directories but allow frontend/app/lib
 lib/
+!frontend/app/lib/
 lib64/
 parts/
 sdist/
