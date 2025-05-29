@@ -102,7 +102,7 @@ export default function Home() {
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-4 lg:space-x-6">
+            <nav className="hidden md:flex items-center space-x-4 lg:space-x-6">
               {NAVIGATION_ITEMS.map((item) => (
                 <Link
                   key={item.path}
@@ -126,6 +126,14 @@ export default function Home() {
                   </span>
                 </Link>
               ))}
+
+              {/* Login Button */}
+              <Link
+                href="/login"
+                className="ml-4 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg text-sm font-medium transition-all duration-300 hover:transform hover:scale-105"
+              >
+                Sign In
+              </Link>
             </nav>
 
             {/* Mobile menu button */}
@@ -172,6 +180,18 @@ export default function Home() {
                     </span>
                   </Link>
                 ))}
+
+                {/* Mobile Login Button */}
+                <Link
+                  href="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block px-4 py-3 rounded-xl text-base font-medium transition-all duration-300 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-center"
+                >
+                  <span className="flex items-center justify-center gap-3">
+                    <span className="text-lg">🔐</span>
+                    Sign In
+                  </span>
+                </Link>
               </nav>
             </div>
           )}
@@ -228,7 +248,7 @@ export default function Home() {
                 size="lg"
                 className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105"
               >
-                <Link href="/dashboard" className="flex items-center gap-2">
+                <Link href="/login" className="flex items-center gap-2">
                   🚀 Start Growing Now
                 </Link>
               </Button>
@@ -554,7 +574,7 @@ export default function Home() {
                 size="lg"
                 className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 sm:px-12 py-4 sm:py-6 text-lg sm:text-xl font-bold rounded-xl shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105"
               >
-                <Link href="/dashboard" className="flex items-center gap-2 sm:gap-3">
+                <Link href="/login" className="flex items-center gap-2 sm:gap-3">
                   🚀 Start Your Journey
                 </Link>
               </Button>

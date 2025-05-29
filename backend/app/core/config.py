@@ -1,6 +1,10 @@
 import os
 from typing import List
 from pydantic_settings import BaseSettings
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv(override=True)
 
 class Settings(BaseSettings):
     # App settings
@@ -28,7 +32,7 @@ class Settings(BaseSettings):
     TWITTER_CLIENT_ID: str = os.getenv("TWITTER_CLIENT_ID", "")
     TWITTER_CLIENT_SECRET: str = os.getenv("TWITTER_CLIENT_SECRET", "")
     TWITTER_BEARER_TOKEN: str = os.getenv("TWITTER_BEARER_TOKEN", "")
-    TWITTER_OAUTH_REDIRECT_URI: str = os.getenv("TWITTER_OAUTH_REDIRECT_URI", "http://localhost:3000/auth/callback")
+    TWITTER_OAUTH_REDIRECT_URI: str = os.getenv("TWITTER_OAUTH_REDIRECT_URI", "http://localhost:3000/auth/twitter/oauth2-callback")
 
     # Twitter API v1.1 (for tweepy compatibility)
     TWITTER_API_KEY: str = os.getenv("TWITTER_API_KEY", "")
@@ -52,6 +56,7 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
     class Config:
-        env_file = ".env"
+        env_file = [".env"]  # Look for .env in current directory
+        env_file_encoding = 'utf-8'
 
 settings = Settings()

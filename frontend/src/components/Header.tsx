@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { NAVIGATION_ITEMS } from '@/lib/constants';
 import Logo from '@/components/ui/Logo';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface HeaderProps {
   showNavigation?: boolean;
@@ -13,6 +14,8 @@ interface HeaderProps {
 const Header = ({ showNavigation = true }: HeaderProps) => {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const { user, logout, isAuthenticated } = useAuth();
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 relative z-50">
@@ -62,14 +65,61 @@ const Header = ({ showNavigation = true }: HeaderProps) => {
             )}
 
             {/* User menu */}
-            <button className="text-gray-600 hover:text-gray-900 p-2 rounded-md">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5-5-5h5v-12" />
-              </svg>
-            </button>
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-              <span className="text-sm font-medium text-gray-700">U</span>
-            </div>
+            {isAuthenticated ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 p-2 rounded-md"
+                >
+                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-medium text-purple-600">
+                      {user?.full_name?.[0] || user?.username?.[0] || 'U'}
+                    </span>
+                  </div>
+                  <span className="hidden sm:block text-sm font-medium">
+                    {user?.full_name || user?.username}
+                  </span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* User dropdown menu */}
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                    <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-100">
+                      <p className="font-medium">{user?.full_name || user?.username}</p>
+                      {user?.twitter_username && (
+                        <p className="text-gray-500">@{user.twitter_username}</p>
+                      )}
+                    </div>
+                    <Link
+                      href="/settings"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Settings
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        logout();
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                Sign In
+              </Link>
+            )}
           </div>
         </div>
 

@@ -45,11 +45,25 @@ export default function TwitterCallbackPage() {
         return;
       }
 
+      // Get stored oauth_token_secret
+      const oauth_token_secret = sessionStorage.getItem('twitter_oauth_token_secret');
+      if (!oauth_token_secret) {
+        setStatus('error');
+        setMessage('OAuth token secret not found. Please restart the authentication process.');
+        setTimeout(() => router.push('/settings'), 3000);
+        return;
+      }
+
       // Complete the OAuth flow
       const result = await twitterAuthService.handleTwitterCallback({
         oauth_token,
-        oauth_verifier
+        oauth_verifier,
+        oauth_token_secret
       });
+
+      // Clean up stored tokens
+      sessionStorage.removeItem('twitter_oauth_token_secret');
+      sessionStorage.removeItem('twitter_oauth_token');
 
       setStatus('success');
       setMessage(result.message);
@@ -113,14 +127,14 @@ export default function TwitterCallbackPage() {
           <div className="flex justify-center mb-4">
             {getStatusIcon()}
           </div>
-          
+
           <h2 className={`text-2xl font-bold ${getStatusColor()}`}>
             {getStatusTitle()}
           </h2>
-          
+
           <div className="mt-4 space-y-2">
             <p className="text-gray-600">{message}</p>
-            
+
             {status === 'success' && twitterUsername && (
               <p className="text-sm text-gray-500">
                 Connected as <span className="font-medium text-twitter-blue">@{twitterUsername}</span>
