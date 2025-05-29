@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { twitterAuthService, TwitterStatus } from '../lib/twitterAuthService';
-import { authService } from '../lib/authService';
+import { twitterAuthService, TwitterStatus } from '@/lib/twitterAuthService';
+import { authService } from '@/lib/authService';
 
 interface TwitterAuthProps {
   onStatusChange?: (status: TwitterStatus) => void;
