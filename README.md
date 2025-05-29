@@ -1,4 +1,4 @@
-# AutoReach - Twitter Growth Platform 
+# AutoReach - Twitter Growth Platform
 
 # Start independent parts
 from the back end: python start_server.py
@@ -8,11 +8,16 @@ A comprehensive platform for Twitter growth and engagement automation.
 
 ## 🔒 Security Notice
 
-**⚠️ IMPORTANT**: This is a public repository. Before deploying:
-1. **Fork this repository** to your private account
-2. **Never commit** API keys, secrets, or credentials
-3. **Review** the [Security Guide](./SECURITY.md) before deployment
-4. **Use environment variables** for all sensitive configuration
+**🚨 CRITICAL SECURITY WARNING**: This is a public repository. Before deploying:
+
+1. **NEVER commit real credentials** - Always use placeholder values in .env files
+2. **Fork this repository** to your private account for production use
+3. **Regenerate ALL API keys** if you've accidentally committed real credentials
+4. **Review** the [Security Guide](./SECURITY.md) before deployment
+5. **Use environment variables** for all sensitive configuration
+6. **Monitor your accounts** for unauthorized access if credentials were exposed
+
+**If you've committed real credentials**: Immediately revoke and regenerate all API keys and database passwords.
 
 ## 🚀 Features
 
