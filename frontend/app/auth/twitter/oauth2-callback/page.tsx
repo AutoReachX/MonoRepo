@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { authService } from '@/lib/authService';
+import { authService } from '../../../lib/authService';
 
 function TwitterOAuth2CallbackContent() {
   const router = useRouter();

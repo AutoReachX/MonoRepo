@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { apiClient } from '@/lib/apiClient';
-import { authService, LoginResponse } from '@/lib/authService';
-import { contentService } from '@/lib/contentService';
-import { HealthCheckResponse, ContentHistoryResponse } from '@/types/api';
+import { apiClient } from '../lib/apiClient';
+import { authService, LoginResponse } from '../lib/authService';
+import { contentService } from '../lib/contentService';
+import { HealthCheckResponse, ContentHistoryResponse } from '../types/api';
 
 interface TestResult {
   name: string;

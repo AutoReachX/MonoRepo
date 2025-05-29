@@ -1,13 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@': require('path').resolve(__dirname, 'app'),
-    };
-    return config;
-  },
+  // Remove custom webpack config and rely on tsconfig.json paths
 };
 
 export default nextConfig;
