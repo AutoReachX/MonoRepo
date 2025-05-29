@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import ConnectionTest from '@/components/ConnectionTest';
 
 export default function TestConnectionPage() {
@@ -52,12 +53,12 @@ export default function TestConnectionPage() {
             </div>
 
             <div className="mt-6 text-center">
-              <a
+              <Link
                 href="/"
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 ← Back to Home
-              </a>
+              </Link>
             </div>
           </div>
         </div>

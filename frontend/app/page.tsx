@@ -3,21 +3,13 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
-import Logo from '@/components/ui/Logo';
+
 import { NAVIGATION_ITEMS } from '@/lib/constants';
 
 export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-    const interval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
 
   const testimonials = [
     {
@@ -39,6 +31,16 @@ export default function Home() {
       avatar: "👩‍🎨"
     }
   ];
+
+  useEffect(() => {
+    setIsVisible(true);
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [testimonials.length]);
+
+
 
   const features = [
     {
@@ -222,7 +224,7 @@ export default function Home() {
 
             {/* Subheadline */}
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-6 sm:mb-8 max-w-4xl mx-auto leading-relaxed px-4 sm:px-0">
-              Stop wasting time on content that doesn't convert. Our AI creates viral tweets,
+              Stop wasting time on content that doesn&apos;t convert. Our AI creates viral tweets,
               automates engagement, and grows your audience while you focus on what matters.
             </p>
 
@@ -292,7 +294,7 @@ export default function Home() {
                         : 'opacity-0 translate-y-4'
                     }`}
                   >
-                    <p className="text-gray-300 italic mb-2">"{testimonial.text}"</p>
+                    <p className="text-gray-300 italic mb-2">&ldquo;{testimonial.text}&rdquo;</p>
                     <div className="flex items-center justify-center gap-2">
                       <span className="text-lg">{testimonial.avatar}</span>
                       <div className="text-sm">
@@ -315,7 +317,7 @@ export default function Home() {
               <span className="block sm:inline bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"> Dominate Twitter</span>
             </h2>
             <p className="text-base sm:text-lg lg:text-xl text-gray-400 max-w-3xl mx-auto px-4 sm:px-0">
-              Stop using 5 different tools. AutoReach is the only Twitter growth platform you'll ever need.
+              Stop using 5 different tools. AutoReach is the only Twitter growth platform you&apos;ll ever need.
             </p>
           </div>
 
@@ -565,7 +567,7 @@ export default function Home() {
               <span className="block sm:inline bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"> Twitter Empire?</span>
             </h2>
             <p className="text-base sm:text-lg lg:text-xl text-gray-300 mb-6 sm:mb-8 max-w-3xl mx-auto px-4 sm:px-0">
-              Join thousands of creators who've transformed their Twitter presence with AutoReach.
+              Join thousands of creators who&apos;ve transformed their Twitter presence with AutoReach.
               Start with just $29 and watch your audience grow.
             </p>
 

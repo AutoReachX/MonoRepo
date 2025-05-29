@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import { apiClient } from '../lib/apiClient';
-import { authService } from '../lib/authService';
+import { authService, LoginResponse } from '../lib/authService';
 import { contentService } from '../lib/contentService';
+import { HealthCheckResponse, ContentHistoryResponse } from '../types/api';
 
 interface TestResult {
   name: string;
@@ -38,14 +39,15 @@ export default function ConnectionTest() {
       // Test 1: Backend Health Check
       try {
         // Use the API health endpoint
-        const health = await apiClient.get<{status: string, api?: string, version?: string}>('/health');
+        const health = await apiClient.get<HealthCheckResponse>('/health');
         if (health && health.status === 'healthy') {
           updateTest(0, 'success', `Backend is healthy (API: ${health.api || 'ready'})`);
         } else {
           updateTest(0, 'error', 'Backend health check failed');
         }
-      } catch (error: any) {
-        updateTest(0, 'error', `Backend not accessible: ${error.message}`);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        updateTest(0, 'error', `Backend not accessible: ${errorMessage}`);
       }
 
       // Test 2: API Configuration
@@ -56,8 +58,9 @@ export default function ConnectionTest() {
         } else {
           updateTest(1, 'error', `Incorrect API URL: ${baseURL}`);
         }
-      } catch (error: any) {
-        updateTest(1, 'error', `API configuration error: ${error.message}`);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        updateTest(1, 'error', `API configuration error: ${errorMessage}`);
       }
 
       // Test 3: Authentication Test
@@ -72,14 +75,15 @@ export default function ConnectionTest() {
         // Try to register (might fail if user exists)
         try {
           await authService.register(testUser);
-        } catch (error: any) {
-          if (!error.message.includes('already registered')) {
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+          if (!errorMessage.includes('already registered')) {
             throw error;
           }
         }
 
         // Try to login
-        const loginResult = await authService.login({
+        const loginResult: LoginResponse = await authService.login({
           username: testUser.username,
           password: testUser.password
         });
@@ -90,23 +94,25 @@ export default function ConnectionTest() {
         } else {
           updateTest(2, 'error', 'Login failed');
         }
-      } catch (error: any) {
-        updateTest(2, 'error', `Authentication failed: ${error.message}`);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        updateTest(2, 'error', `Authentication failed: ${errorMessage}`);
       }
 
       // Test 4: Content Service Test
       try {
         if (authService.isAuthenticated()) {
-          const history = await contentService.getContentHistory(0, 5);
-          updateTest(3, 'success', `Content history retrieved (${history.total} items)`);
+          const history: ContentHistoryResponse = await contentService.getContentHistory(0, 5);
+          updateTest(3, 'success', `Content history retrieved (${history.total || 0} items)`);
         } else {
           updateTest(3, 'error', 'Not authenticated for content test');
         }
-      } catch (error: any) {
-        updateTest(3, 'error', `Content service failed: ${error.message}`);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        updateTest(3, 'error', `Content service failed: ${errorMessage}`);
       }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Test suite error:', error);
     } finally {
       setIsRunning(false);
@@ -131,8 +137,9 @@ export default function ConnectionTest() {
       } else {
         alert(`Content generation failed: ${result.error || 'Unknown error'}`);
       }
-    } catch (error: any) {
-      alert(`Content generation error: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      alert(`Content generation error: ${errorMessage}`);
     }
   };
 

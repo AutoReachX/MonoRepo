@@ -39,12 +39,17 @@ class TestContentAPI:
 
     def test_generate_tweet_success(self):
         """Test successful tweet generation endpoint"""
+        # Import the new types
+        from app.core.types import ContentGenerationResult
+
         # Arrange
-        self.mock_content_service.generate_and_log_tweet = AsyncMock(return_value={
-            "content": "Generated tweet content",
-            "prompt": "Test prompt",
-            "tokens_used": 50
-        })
+        mock_result = ContentGenerationResult(
+            content="Generated tweet content",
+            prompt="Test prompt",
+            tokens_used=50,
+            metadata={"style": "engaging", "language": "en"}
+        )
+        self.mock_content_service.generate_and_log_tweet = AsyncMock(return_value=mock_result)
 
         request_data = {
             "topic": "AI and machine learning",
@@ -60,11 +65,12 @@ class TestContentAPI:
             print(f"Response status: {response.status_code}")
             print(f"Response content: {response.text}")
         assert response.status_code == 200
-        data = response.json()
-        assert data["success"] is True
-        assert data["content"] == "Generated tweet content"
-        assert data["prompt"] == "Test prompt"
-        assert data["tokens_used"] == 50
+        response_data = response.json()
+        assert response_data["success"] is True
+        assert response_data["content"] == "Generated tweet content"
+        assert response_data["prompt"] == "Test prompt"
+        assert response_data["tokens_used"] == 50
+        assert response_data["metadata"]["style"] == "engaging"
 
     def test_generate_tweet_validation_error(self):
         """Test tweet generation with validation error"""
@@ -87,12 +93,17 @@ class TestContentAPI:
 
     def test_generate_thread_success(self):
         """Test successful thread generation endpoint"""
+        # Import the new types
+        from app.core.types import ContentGenerationResult
+
         # Arrange
-        self.mock_content_service.generate_and_log_thread = AsyncMock(return_value={
-            "content": "Generated thread content",
-            "prompt": "Thread prompt",
-            "tokens_used": 150
-        })
+        mock_result = ContentGenerationResult(
+            content="Generated thread content",
+            prompt="Thread prompt",
+            tokens_used=150,
+            metadata={"num_tweets": 3, "style": "informative", "language": "en"}
+        )
+        self.mock_content_service.generate_and_log_thread = AsyncMock(return_value=mock_result)
 
         request_data = {
             "topic": "AI trends in 2024",
@@ -106,18 +117,30 @@ class TestContentAPI:
 
         # Assert
         assert response.status_code == 200
-        data = response.json()
-        assert data["success"] is True
-        assert data["content"] == "Generated thread content"
+        response_data = response.json()
+        assert response_data["success"] is True
+        assert response_data["content"] == "Generated thread content"
+        assert response_data["prompt"] == "Thread prompt"
+        assert response_data["tokens_used"] == 150
+        assert response_data["metadata"]["num_tweets"] == 3
 
     def test_generate_reply_success(self):
         """Test successful reply generation endpoint"""
+        # Import the new types
+        from app.core.types import ContentGenerationResult
+
         # Arrange
-        self.mock_content_service.generate_and_log_reply = AsyncMock(return_value={
-            "content": "Generated reply content",
-            "prompt": "Reply prompt",
-            "tokens_used": 75
-        })
+        mock_result = ContentGenerationResult(
+            content="Generated reply content",
+            prompt="Reply prompt",
+            tokens_used=75,
+            metadata={
+                "reply_style": "helpful",
+                "language": "en",
+                "original_tweet": "This is an interesting tweet about AI"
+            }
+        )
+        self.mock_content_service.generate_and_log_reply = AsyncMock(return_value=mock_result)
 
         request_data = {
             "original_tweet": "This is an interesting tweet about AI",
@@ -130,9 +153,12 @@ class TestContentAPI:
 
         # Assert
         assert response.status_code == 200
-        data = response.json()
-        assert data["success"] is True
-        assert data["content"] == "Generated reply content"
+        response_data = response.json()
+        assert response_data["success"] is True
+        assert response_data["content"] == "Generated reply content"
+        assert response_data["prompt"] == "Reply prompt"
+        assert response_data["tokens_used"] == 75
+        assert response_data["metadata"]["reply_style"] == "helpful"
 
     def test_generate_tweet_missing_topic(self):
         """Test tweet generation with missing required field"""

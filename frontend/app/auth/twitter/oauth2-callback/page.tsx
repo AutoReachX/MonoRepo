@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { authService } from '@/lib/authService';
 
@@ -9,13 +9,13 @@ export default function TwitterOAuth2CallbackPage() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{ id: string; username: string; name: string } | null>(null);
 
   useEffect(() => {
     handleTwitterOAuth2Callback();
-  }, []);
+  }, [handleTwitterOAuth2Callback]);
 
-  const handleTwitterOAuth2Callback = async () => {
+  const handleTwitterOAuth2Callback = useCallback(async () => {
     try {
       // Get OAuth parameters from URL
       const code = searchParams.get('code');
@@ -72,12 +72,12 @@ export default function TwitterOAuth2CallbackPage() {
       // Redirect to dashboard after success
       setTimeout(() => router.push('/dashboard'), 2000);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       setStatus('error');
-      setMessage(error.message || 'Failed to authenticate with Twitter');
+      setMessage(error instanceof Error ? error.message : 'Failed to authenticate with Twitter');
       setTimeout(() => router.push('/'), 3000);
     }
-  };
+  }, [searchParams, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

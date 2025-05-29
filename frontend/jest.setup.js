@@ -23,5 +23,14 @@ jest.mock('next/router', () => ({
   },
 }))
 
+// Mock window.location for navigation tests
+delete window.location
+window.location = {
+  href: '',
+  assign: jest.fn(),
+  replace: jest.fn(),
+  reload: jest.fn(),
+}
+
 // Mock environment variables
 process.env.NEXT_PUBLIC_API_URL = 'http://localhost:8000/api'

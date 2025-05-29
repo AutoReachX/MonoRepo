@@ -1,9 +1,10 @@
 """
 Content Orchestration Service following Single Responsibility Principle.
 Orchestrates content generation and logging without handling the details of either.
+Refactored to use parameter objects and eliminate long parameter lists.
 """
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from sqlalchemy.orm import Session
 from app.models.user import User
 from app.services.content_generation_service import ContentGenerationService
@@ -12,6 +13,12 @@ from app.services.validation_service import ValidationService
 from app.core.exceptions import ContentGenerationError
 from app.core.error_handlers import ServiceErrorHandler
 from app.core.constants import ContentModes
+from app.core.types import (
+    ContentGenerationRequest,
+    ThreadGenerationRequest,
+    ReplyGenerationRequest,
+    ContentGenerationResult
+)
 
 
 class ContentOrchestrationService:
@@ -19,7 +26,7 @@ class ContentOrchestrationService:
     Service that orchestrates content generation and logging.
     Follows Single Responsibility Principle by delegating specific tasks.
     """
-    
+
     def __init__(
         self,
         generation_service: ContentGenerationService,
@@ -30,160 +37,173 @@ class ContentOrchestrationService:
         self.logging_service = logging_service
         self.validation_service = validation_service
         self.error_handler = ServiceErrorHandler(__name__)
-    
+
     async def generate_and_log_tweet(
         self,
-        topic: str,
-        style: str,
-        user_context: Optional[str],
-        language: str,
-        user: User,
-        db: Session
-    ) -> Dict[str, Any]:
+        request: ContentGenerationRequest
+    ) -> ContentGenerationResult:
         """
         Generate a tweet and log the operation.
-        
+
         This method orchestrates the validation, generation, and logging process.
+        Uses parameter object pattern to reduce complexity and improve maintainability.
         """
         try:
             # 1. Validate input
-            validation_data = {
-                "topic": topic,
-                "style": style,
-                "user_context": user_context,
-                "language": language
-            }
+            validation_data = request.to_dict()
             validation_result = self.validation_service.validate_content_generation_request(validation_data)
-            
+
             if not validation_result["is_valid"]:
                 raise ContentGenerationError(
-                    "Invalid input data", 
+                    "Invalid input data",
                     {"errors": validation_result["errors"]}
                 )
-            
+
             # 2. Generate content
             result = await self.generation_service.generate_tweet(
-                topic=topic,
-                style=style,
-                user_context=user_context,
-                language=language
+                topic=request.topic,
+                style=request.style,
+                user_context=request.user_context,
+                language=request.language
             )
-            
+
             # 3. Log the generation
             self.logging_service.log_content_generation(
-                user=user,
+                user=request.user,
                 prompt=result["prompt"],
                 generated_text=result["content"],
                 mode=ContentModes.NEW_TWEET,
-                db=db,
+                db=request.db,
                 additional_metadata={
-                    "style": style,
-                    "language": language,
+                    "style": request.style,
+                    "language": request.language,
                     "tokens_used": result.get("tokens_used")
                 }
             )
-            
-            return result
-            
+
+            # 4. Return structured result
+            return ContentGenerationResult(
+                content=result["content"],
+                prompt=result["prompt"],
+                tokens_used=result.get("tokens_used"),
+                metadata={
+                    "style": request.style,
+                    "language": request.language
+                }
+            )
+
         except ContentGenerationError:
             raise  # Re-raise validation and generation errors
         except Exception as e:
             self.error_handler.handle_generation_error(e, "tweet generation and logging")
-    
+
     async def generate_and_log_thread(
         self,
-        topic: str,
-        num_tweets: int,
-        style: str,
-        language: str,
-        user: User,
-        db: Session
-    ) -> Dict[str, Any]:
-        """Generate a thread and log the operation"""
+        request: ThreadGenerationRequest
+    ) -> ContentGenerationResult:
+        """
+        Generate a thread and log the operation.
+
+        Uses parameter object pattern for cleaner method signature.
+        """
         try:
             # 1. Validate input
-            validation_data = {
-                "topic": topic,
-                "num_tweets": num_tweets,
-                "style": style,
-                "language": language
-            }
+            validation_data = request.to_dict()
             validation_result = self.validation_service.validate_thread_generation_request(validation_data)
-            
+
             if not validation_result["is_valid"]:
                 raise ContentGenerationError(
-                    "Invalid input data", 
+                    "Invalid input data",
                     {"errors": validation_result["errors"]}
                 )
-            
+
             # 2. Generate content
             result = await self.generation_service.generate_thread(
-                topic=topic,
-                num_tweets=num_tweets,
-                style=style,
-                language=language
+                topic=request.topic,
+                num_tweets=request.num_tweets,
+                style=request.style,
+                language=request.language
             )
-            
+
             # 3. Log the generation
             self.logging_service.log_content_generation(
-                user=user,
+                user=request.user,
                 prompt=result["prompt"],
                 generated_text=result["content"],
                 mode=ContentModes.THREAD,
-                db=db,
+                db=request.db,
                 additional_metadata={
-                    "num_tweets": num_tweets,
-                    "style": style,
-                    "language": language,
+                    "num_tweets": request.num_tweets,
+                    "style": request.style,
+                    "language": request.language,
                     "tokens_used": result.get("tokens_used")
                 }
             )
-            
-            return result
-            
+
+            # 4. Return structured result
+            return ContentGenerationResult(
+                content=result["content"],
+                prompt=result["prompt"],
+                tokens_used=result.get("tokens_used"),
+                metadata={
+                    "num_tweets": request.num_tweets,
+                    "style": request.style,
+                    "language": request.language
+                }
+            )
+
         except ContentGenerationError:
             raise
         except Exception as e:
             self.error_handler.handle_generation_error(e, "thread generation and logging")
-    
+
     async def generate_and_log_reply(
         self,
-        original_tweet: str,
-        reply_style: str,
-        user_context: Optional[str],
-        language: str,
-        user: User,
-        db: Session
-    ) -> Dict[str, Any]:
-        """Generate a reply and log the operation"""
+        request: ReplyGenerationRequest
+    ) -> ContentGenerationResult:
+        """
+        Generate a reply and log the operation.
+
+        Uses parameter object pattern for consistency with other methods.
+        """
         try:
             # 1. Generate content (replies have simpler validation)
             result = await self.generation_service.generate_reply(
-                original_tweet=original_tweet,
-                reply_style=reply_style,
-                user_context=user_context,
-                language=language
+                original_tweet=request.original_tweet,
+                reply_style=request.reply_style,
+                user_context=request.user_context,
+                language=request.language
             )
-            
+
             # 2. Log the generation
             self.logging_service.log_content_generation(
-                user=user,
+                user=request.user,
                 prompt=result["prompt"],
                 generated_text=result["content"],
                 mode=ContentModes.REPLY,
-                db=db,
+                db=request.db,
                 additional_metadata={
-                    "reply_style": reply_style,
-                    "language": language,
+                    "reply_style": request.reply_style,
+                    "language": request.language,
                     "tokens_used": result.get("tokens_used")
                 }
             )
-            
-            return result
-            
+
+            # 3. Return structured result
+            return ContentGenerationResult(
+                content=result["content"],
+                prompt=result["prompt"],
+                tokens_used=result.get("tokens_used"),
+                metadata={
+                    "reply_style": request.reply_style,
+                    "language": request.language,
+                    "original_tweet": request.original_tweet[:100] + "..." if len(request.original_tweet) > 100 else request.original_tweet
+                }
+            )
+
         except Exception as e:
             self.error_handler.handle_generation_error(e, "reply generation and logging")
-    
+
     def get_user_content_history(
         self,
         user: User,
@@ -202,10 +222,10 @@ class ContentOrchestrationService:
                 offset=offset,
                 mode_filter=mode_filter
             )
-            
+
             # Get statistics
             stats = self.logging_service.get_content_statistics(user=user, db=db)
-            
+
             return {
                 "history": [
                     {
@@ -225,7 +245,7 @@ class ContentOrchestrationService:
                     "has_more": len(history) == limit
                 }
             }
-            
+
         except Exception as e:
             self.error_handler.handle_database_error(e, "content history retrieval")
 

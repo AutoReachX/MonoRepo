@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { twitterAuthService } from '@/lib/twitterAuthService';
 import { authService } from '@/lib/authService';
@@ -14,9 +14,9 @@ export default function TwitterCallbackPage() {
 
   useEffect(() => {
     handleTwitterCallback();
-  }, []);
+  }, [handleTwitterCallback]);
 
-  const handleTwitterCallback = async () => {
+  const handleTwitterCallback = useCallback(async () => {
     try {
       // Check if user is authenticated
       if (!authService.isAuthenticated()) {
@@ -72,12 +72,12 @@ export default function TwitterCallbackPage() {
       // Redirect to settings page after success
       setTimeout(() => router.push('/settings'), 2000);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       setStatus('error');
-      setMessage(error.message || 'Failed to connect Twitter account');
+      setMessage(error instanceof Error ? error.message : 'Failed to connect Twitter account');
       setTimeout(() => router.push('/settings'), 3000);
     }
-  };
+  }, [searchParams, router]);
 
   const getStatusIcon = () => {
     switch (status) {

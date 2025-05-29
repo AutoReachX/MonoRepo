@@ -1,11 +1,19 @@
 'use client';
 
 import React, { useState } from 'react';
-import { authService } from '@/lib/authService';
+import { authService, TwitterOAuth2InitResponse, TwitterOAuth2CallbackResponse } from '@/lib/authService';
 import TwitterOAuth2Login from '@/components/TwitterOAuth2Login';
 
+interface TestResult {
+  success?: boolean;
+  user?: TwitterOAuth2CallbackResponse['user'];
+  authorization_url?: string;
+  state?: string;
+  code_verifier?: string;
+}
+
 export default function TestTwitterOAuth2Page() {
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<TestResult | TwitterOAuth2InitResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -17,14 +25,15 @@ export default function TestTwitterOAuth2Page() {
     try {
       const response = await authService.initiateTwitterOAuth2();
       setResult(response);
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleTwitterSuccess = (user: any) => {
+  const handleTwitterSuccess = (user: TwitterOAuth2CallbackResponse['user']) => {
     setResult({ success: true, user });
   };
 
@@ -50,7 +59,7 @@ export default function TestTwitterOAuth2Page() {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
               Manual API Test
             </h2>
-            
+
             <button
               onClick={testOAuth2Init}
               disabled={isLoading}
@@ -81,7 +90,7 @@ export default function TestTwitterOAuth2Page() {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
               Component Test
             </h2>
-            
+
             <TwitterOAuth2Login
               onSuccess={handleTwitterSuccess}
               onError={handleTwitterError}
@@ -103,7 +112,7 @@ export default function TestTwitterOAuth2Page() {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             API Endpoints
           </h2>
-          
+
           <div className="space-y-4">
             <div className="border-l-4 border-blue-500 pl-4">
               <h3 className="font-medium text-gray-900">POST /api/auth/oauth2/twitter/init</h3>
@@ -112,7 +121,7 @@ export default function TestTwitterOAuth2Page() {
                 {`{ "redirect_uri": "http://localhost:3000/auth/twitter/oauth2-callback" }`}
               </code>
             </div>
-            
+
             <div className="border-l-4 border-green-500 pl-4">
               <h3 className="font-medium text-gray-900">POST /api/auth/oauth2/twitter/callback</h3>
               <p className="text-sm text-gray-600">Handle Twitter OAuth 2.0 callback</p>
@@ -128,7 +137,7 @@ export default function TestTwitterOAuth2Page() {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             Environment Check
           </h2>
-          
+
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span>Backend URL:</span>

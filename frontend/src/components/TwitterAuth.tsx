@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { twitterAuthService, TwitterStatus } from '../lib/twitterAuthService';
 import { authService } from '../lib/authService';
 
@@ -14,23 +14,24 @@ export default function TwitterAuth({ onStatusChange }: TwitterAuthProps) {
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-    setIsAuthenticated(authService.isAuthenticated());
-    if (authService.isAuthenticated()) {
-      loadTwitterStatus();
-    }
-  }, []);
-
-  const loadTwitterStatus = async () => {
+  const loadTwitterStatus = useCallback(async () => {
     try {
       setError(null);
       const status = await twitterAuthService.getTwitterStatus();
       setTwitterStatus(status);
       onStatusChange?.(status);
-    } catch (error: any) {
-      setError(`Failed to load Twitter status: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setError(`Failed to load Twitter status: ${errorMessage}`);
     }
-  };
+  }, [onStatusChange]);
+
+  useEffect(() => {
+    setIsAuthenticated(authService.isAuthenticated());
+    if (authService.isAuthenticated()) {
+      loadTwitterStatus();
+    }
+  }, [loadTwitterStatus]);
 
   const handleConnectTwitter = async () => {
     if (!isAuthenticated) {
@@ -43,15 +44,16 @@ export default function TwitterAuth({ onStatusChange }: TwitterAuthProps) {
 
     try {
       const authData = await twitterAuthService.initiateTwitterAuth();
-      
+
       // Store oauth_token_secret for the callback
       sessionStorage.setItem('twitter_oauth_token_secret', authData.oauth_token_secret);
       sessionStorage.setItem('twitter_oauth_token', authData.oauth_token);
-      
+
       // Redirect to Twitter authorization
       window.location.href = authData.authorization_url;
-    } catch (error: any) {
-      setError(`Failed to connect Twitter: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setError(`Failed to connect Twitter: ${errorMessage}`);
       setIsLoading(false);
     }
   };
@@ -65,8 +67,9 @@ export default function TwitterAuth({ onStatusChange }: TwitterAuthProps) {
       const newStatus = { connected: false };
       setTwitterStatus(newStatus);
       onStatusChange?.(newStatus);
-    } catch (error: any) {
-      setError(`Failed to disconnect Twitter: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setError(`Failed to disconnect Twitter: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -103,7 +106,7 @@ export default function TwitterAuth({ onStatusChange }: TwitterAuthProps) {
             )}
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-3">
           {twitterStatus.connected ? (
             <>

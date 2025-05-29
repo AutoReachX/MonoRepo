@@ -97,6 +97,9 @@ class ValidationRules:
     MAX_USERNAME_LENGTH = 50
     MIN_PASSWORD_LENGTH = 8
     MAX_PASSWORD_LENGTH = 128
+    MIN_THREAD_SIZE = 2
+    MAX_THREAD_SIZE = 25
+    MAX_TWEET_LENGTH = 280
 
 
 # Rate Limiting
@@ -132,6 +135,8 @@ class ErrorMessages:
     GENERATION_FAILED = "Content generation failed. Please try again."
     RATE_LIMIT_EXCEEDED = "Rate limit exceeded. Please try again later."
     EXTERNAL_API_ERROR = "External service is temporarily unavailable"
+    VALIDATION_ERROR = "Invalid input data"
+    UNAUTHORIZED = "Authentication required"
 
 
 # Success Messages
