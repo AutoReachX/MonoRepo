@@ -24,11 +24,6 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-
-  // Handle redirects properly
-  async redirects() {
-    return [];
-  },
 };
 
 export default nextConfig;
