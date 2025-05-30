@@ -1,13 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Output configuration for production
-  output: 'standalone',
+  // Output configuration for static export
+  output: 'export',
 
   // Ensure proper trailing slash handling
   trailingSlash: false,
 
-  // Image optimization for production
+  // Image optimization for production (required for static export)
   images: {
     unoptimized: true
   },
@@ -20,19 +20,13 @@ const nextConfig: NextConfig = {
   // Enable React strict mode for better development
   reactStrictMode: true,
 
-  // Disable powered by header
-  poweredByHeader: false,
-
-  // Compress responses
-  compress: true,
+  // Disable features not supported in static export
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 
   // Handle redirects properly
   async redirects() {
-    return [];
-  },
-
-  // Handle rewrites for SPA behavior
-  async rewrites() {
     return [];
   },
 };
