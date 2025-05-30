@@ -213,8 +213,7 @@ class OpenAIService(ContentGeneratorInterface):
 
         except Exception as e:
             raise OpenAIAPIError(
-                f"Reply generation failed: {
-                    str(e)}", {
+                f"Reply generation failed: {str(e)}", {
                     "original_tweet": original_tweet, "reply_style": reply_style})
 
 
