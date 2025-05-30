@@ -14,11 +14,13 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
   },
 
-  // Disable strict mode for better compatibility
-  reactStrictMode: false,
+  // Enable React strict mode for better development
+  reactStrictMode: true,
 
-  // Optimize for production
-  swcMinify: true,
+  // Experimental features
+  experimental: {
+    optimizeCss: true,
+  },
 
   // Handle redirects properly
   async redirects() {
