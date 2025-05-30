@@ -1,6 +1,5 @@
 import os
 from typing import List
-from pydantic import Field
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
@@ -14,18 +13,9 @@ class Settings(BaseSettings):
     VERSION: str = "1.0.0"
 
     # Security
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "")
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "your-secret-key-here")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-
-    def model_post_init(self, __context):  # noqa: ARG002
-        # Debug logging for deployment troubleshooting
-        print(f"DEBUG: SECRET_KEY value: '{self.SECRET_KEY}'")
-        print(f"DEBUG: SECRET_KEY from os.getenv: '{os.getenv('SECRET_KEY', 'NOT_FOUND')}'")
-        print(f"DEBUG: Available env vars containing 'SECRET': {[k for k in os.environ.keys() if 'SECRET' in k]}")
-
-        if not self.SECRET_KEY:
-            raise ValueError("SECRET_KEY environment variable is required for security")
 
     # Database
     DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://user:password@localhost/autoreach")
@@ -35,7 +25,9 @@ class Settings(BaseSettings):
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:3001",
-        "http://127.0.0.1:3001"
+        "http://127.0.0.1:3001",
+        "https://*.onrender.com",
+        os.getenv("FRONTEND_URL", "")
     ]
 
     # Twitter API (OAuth 2.0)
