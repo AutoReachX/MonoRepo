@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Output configuration for production
+  output: 'standalone',
+
   // Ensure proper trailing slash handling
   trailingSlash: false,
 
@@ -16,6 +19,12 @@ const nextConfig: NextConfig = {
 
   // Enable React strict mode for better development
   reactStrictMode: true,
+
+  // Disable powered by header
+  poweredByHeader: false,
+
+  // Compress responses
+  compress: true,
 
   // Handle redirects properly
   async redirects() {
