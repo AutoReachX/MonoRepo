@@ -209,7 +209,7 @@ async def twitter_callback(
     if not result["success"]:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Failed to get Twitter access tokens: {result['error']}"
+            detail=f"Darn, Failed to get Twitter access tokens: {result['error']}"
         )
 
     # Update user with Twitter credentials
