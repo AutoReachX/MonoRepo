@@ -70,9 +70,8 @@ class Language:
         """Validate language on creation"""
         if self.code not in ContentConstants.SUPPORTED_LANGUAGES:
             raise ValidationError(
-                f"Unsupported language: {
-                    self.code}. Supported: {
-                    ContentConstants.SUPPORTED_LANGUAGES}")
+                f"Unsupported language: {self.code}. "
+                f"Supported: {ContentConstants.SUPPORTED_LANGUAGES}")
 
     def __str__(self) -> str:
         return self.code
