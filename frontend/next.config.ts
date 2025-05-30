@@ -17,11 +17,6 @@ const nextConfig: NextConfig = {
   // Enable React strict mode for better development
   reactStrictMode: true,
 
-  // Experimental features
-  experimental: {
-    optimizeCss: true,
-  },
-
   // Handle redirects properly
   async redirects() {
     return [];
