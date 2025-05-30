@@ -228,14 +228,14 @@ class TwitterContentValidator(BaseValidator):
         # Check for excessive hashtags
         if TwitterContentValidator._count_hashtags(content) > TwitterConstants.MAX_HASHTAGS_RECOMMENDED:
             result.add_error(
-                f"Tweet contains too many hashtags (max {
-                    TwitterConstants.MAX_HASHTAGS_RECOMMENDED} recommended)")
+                f"Tweet contains too many hashtags (max "
+                f"{TwitterConstants.MAX_HASHTAGS_RECOMMENDED} recommended)")
 
         # Check for excessive mentions
         if TwitterContentValidator._count_mentions(content) > TwitterConstants.MAX_MENTIONS_RECOMMENDED:
             result.add_error(
-                f"Tweet contains too many mentions (max {
-                    TwitterConstants.MAX_MENTIONS_RECOMMENDED} recommended)")
+                f"Tweet contains too many mentions (max "
+                f"{TwitterConstants.MAX_MENTIONS_RECOMMENDED} recommended)")
 
         return result
 
