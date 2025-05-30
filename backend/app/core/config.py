@@ -1,5 +1,6 @@
 import os
 from typing import List
+from pydantic import Field
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
@@ -18,30 +19,24 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     def model_post_init(self, __context):  # noqa: ARG002
+        # Debug logging for deployment troubleshooting
+        print(f"DEBUG: SECRET_KEY value: '{self.SECRET_KEY}'")
+        print(f"DEBUG: SECRET_KEY from os.getenv: '{os.getenv('SECRET_KEY', 'NOT_FOUND')}'")
+        print(f"DEBUG: Available env vars containing 'SECRET': {[k for k in os.environ.keys() if 'SECRET' in k]}")
+
         if not self.SECRET_KEY:
             raise ValueError("SECRET_KEY environment variable is required for security")
 
     # Database
     DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://user:password@localhost/autoreach")
 
-    # CORS - Secure configuration
+    # CORS
     ALLOWED_HOSTS: List[str] = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:3001",
         "http://127.0.0.1:3001"
     ]
-
-    @property
-    def get_allowed_hosts(self) -> List[str]:
-        """Get CORS allowed hosts with security validation"""
-        hosts = list(self.ALLOWED_HOSTS)
-
-        # Add frontend URL if specified and valid
-        if self.FRONTEND_URL and self.FRONTEND_URL not in hosts:
-            hosts.append(self.FRONTEND_URL)
-
-        return hosts
 
     # Twitter API (OAuth 2.0)
     TWITTER_CLIENT_ID: str = os.getenv("TWITTER_CLIENT_ID", "")
